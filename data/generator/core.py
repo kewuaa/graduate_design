@@ -8,8 +8,6 @@ import asyncio
 from PIL import Image, ImageDraw
 
 from cython_lib import circle as Circle
-
-
 IMG_NUM = 10000
 IMG_SIZE = 140
 MAX_CIRCLE_NUM = 3
@@ -74,6 +72,9 @@ async def main() -> None:
         for task in tasks:
             await task
 
+def run():
+    asyncio.get_event_loop().run_until_complete(main())
+
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    run()

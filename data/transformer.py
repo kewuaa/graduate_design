@@ -3,7 +3,6 @@ from pathlib import Path
 import asyncio
 
 import cv2
-import numpy as np
 current_path = Path(__file__).parent
 source_path = current_path / 'imgs'
 if not source_path.exists():
@@ -31,7 +30,7 @@ radon = partial(
 # mask = create_mask()
 
 
-async def transform(name):
+async def _transform(name):
     loop = asyncio.get_event_loop()
     image = await loop.run_in_executor(
         None,
@@ -49,14 +48,16 @@ async def transform(name):
     )
 
 
-async def main():
-    for i in range(0, 10000, 10):
-        tasks = [
-            asyncio.create_task(transform(f'{i + j + 1}.png'))
-            for j in range(10)
-        ]
-        for task in tasks:
-            await task
+def transform():
+    async def transform():
+        for i in range(0, 10000, 10):
+            tasks = [
+                asyncio.create_task(_transform(f'{i + j + 1}.png'))
+                for j in range(10)
+            ]
+            for task in tasks:
+                await task
+    asyncio.get_event_loop().run_until_complete(transform())
 
 
 def test():
@@ -65,10 +66,9 @@ def test():
     sinogram = radon(img)
     cv2.imshow('origin', img)
     cv2.imshow('radon image', sinogram)
-    # cv2.imshow('image', np.hstack([img, sinogram]))
     cv2.waitKey(0)
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(main())
+    transform()
     # test()
