@@ -1,6 +1,7 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
+# cython: cdivision=True
 from libc.stdlib cimport rand, srand
 from libc.time cimport time
 from libc.math cimport pow as c_pow, sqrt as c_sqrt, fmin as c_min
