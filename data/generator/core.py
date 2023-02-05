@@ -3,36 +3,19 @@ from pathlib import Path
 import random
 import asyncio
 
-# from matplotlib import pyplot as plt
-# from matplotlib import patches
 from PIL import Image, ImageDraw
 
-from cython_lib import circle as Circle
-IMG_NUM = 10000
+from cython_lib import circle
+IMG_NUM = 100
 IMG_SIZE = 140
+MIN_SIZE = 10
+MAX_SIZE = 30
 MAX_CIRCLE_NUM = 3
 current_path = Path(__file__).parent
 
 
 async def main() -> None:
     async def generate_one(index: int) -> None:
-        # axis: plt.Axes = fig.add_axes([0, 0, 1, 1])
-        # axis.axis([-half_size, half_size, -half_size, half_size])
-        # axis.set_aspect(1)
-        # axis.axis('off')
-        # circles = await loop.run_in_executor(
-        #     None,
-        #     Circle.generate,
-        #     random.randint(1, MAX_CIRCLE_NUM),
-        # )
-        # for circle in circles:
-        #     alpha = random.random() / 2 + 0.5
-        #     patch = patches.Circle((circle[0], circle[1]), circle[2])
-        #     patch.set_color('black')
-        #     patch.set_alpha(alpha)
-        #     axis.add_patch(patch)
-        # plt.savefig(str(img_save_path / f'{index + 1}.png'))
-        # axis.clear()
         circles = await loop.run_in_executor(
             None,
             Circle.generate,
@@ -40,9 +23,9 @@ async def main() -> None:
         )
         img = Image.new('L', (IMG_SIZE, IMG_SIZE), 255)
         draw = ImageDraw.Draw(img)
-        for circle in circles:
+        for c in circles:
             alpha = random.randint(1, 130)
-            left_top, right_bottom = circle
+            left_top, right_bottom = c
             draw.ellipse(
                 (left_top, right_bottom),
                 fill=alpha,
@@ -57,10 +40,8 @@ async def main() -> None:
             )
         )
 
-    # half_size = IMG_SIZE / 2
-    # fig: plt.Figure = plt.figure(figsize=(IMG_SIZE / 100,) * 2)
-
-    img_save_path = current_path / '../imgs'
+    Circle = circle.Circle(0., IMG_SIZE, 0., IMG_SIZE, MIN_SIZE, MAX_SIZE)
+    img_save_path = current_path / '../img1s'
     img_save_path.mkdir(exist_ok=True)
     batch_size = 10
     loop = asyncio.get_event_loop()
@@ -71,6 +52,7 @@ async def main() -> None:
         ]
         for task in tasks:
             await task
+
 
 def run():
     asyncio.get_event_loop().run_until_complete(main())
