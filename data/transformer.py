@@ -1,6 +1,7 @@
 from functools import partial
 from pathlib import Path
 import asyncio
+import json
 
 import cv2
 current_path = Path(__file__).parent
@@ -9,9 +10,13 @@ if not source_path.exists():
     raise RuntimeWarning('source images directory not exists')
 target_path = current_path / 'transformed_imgs'
 target_path.mkdir(exist_ok=True)
+with open(current_path / 'setting.json') as f:
+    setting = json.load(f)
+img_size = setting['image_size']
+img_num = setting['image_num']
 radon = partial(
     cv2.ximgproc.RadonTransform,
-    theta=180 / 140,
+    theta=180 / img_size,
     crop=True,
     start_angle=0,
     end_angle=180,
@@ -50,7 +55,7 @@ async def _transform(name):
 
 def transform():
     async def transform():
-        for i in range(0, 10000, 10):
+        for i in range(0, img_num, 10):
             tasks = [
                 asyncio.create_task(_transform(f'{i + j + 1}.png'))
                 for j in range(10)
