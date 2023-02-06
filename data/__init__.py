@@ -1,5 +1,5 @@
 def init():
     from . import generator
-    from . import transformer
     generator.generate()
+    from . import transformer
     transformer.transform()

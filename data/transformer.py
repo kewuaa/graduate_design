@@ -4,6 +4,7 @@ import asyncio
 import json
 
 import cv2
+import numpy as np
 current_path = Path(__file__).parent
 source_path = current_path / 'imgs'
 if not source_path.exists():
@@ -66,8 +67,9 @@ def transform():
 
 
 def test():
-    img = cv2.imread(str(source_path / '99.png'), cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(str(source_path / '96.png'), cv2.IMREAD_GRAYSCALE)
     # img = np.where(mask, img, 0)
+    print(np.unique(img))
     sinogram = radon(img)
     cv2.imshow('origin', img)
     cv2.imshow('radon image', sinogram)
@@ -75,5 +77,5 @@ def test():
 
 
 if __name__ == "__main__":
-    transform()
-    # test()
+    # transform()
+    test()

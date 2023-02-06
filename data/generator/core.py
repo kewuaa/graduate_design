@@ -6,7 +6,7 @@ import json
 
 from PIL import Image, ImageDraw
 
-from cython_lib import circle
+from .cython_lib import circle
 current_path = Path(__file__).parent
 with open(current_path / '../setting.json') as f:
     setting = json.load(f)
@@ -52,7 +52,7 @@ async def main() -> None:
         min_circle_size,
         max_circle_size
     )
-    img_save_path = current_path / '../img1s'
+    img_save_path = current_path / '../imgs'
     img_save_path.mkdir(exist_ok=True)
     batch_size = 10
     loop = asyncio.get_event_loop()
