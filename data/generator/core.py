@@ -15,7 +15,8 @@ img_size = setting['image_size']
 min_circle_size = setting['min_circle_size']
 max_circle_size = setting['max_circle_size']
 max_circle_num = setting['max_circle_num']
-pixel_option = setting['pixel_option']
+# pixel_option = setting['pixel_option']
+pixel_option = list(range(0, 128, 10))
 
 
 async def main() -> None:
@@ -28,7 +29,7 @@ async def main() -> None:
         img = Image.new('L', (img_size, img_size), 255)
         draw = ImageDraw.Draw(img)
         for c in circles:
-            alpha = random.choice([30, 60, 90, 120])
+            alpha = random.choice(pixel_option)
             left_top, right_bottom = c
             draw.ellipse(
                 (left_top, right_bottom),
