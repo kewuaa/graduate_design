@@ -1,8 +1,10 @@
 from torch import nn
-import torch
+from torch import Tensor
+
+from .base import BaseNet
 
 
-class Automap(nn.Module):
+class Automap(BaseNet):
     def __init__(self, projection_num: int, img_size: int) -> None:
         super(Automap, self).__init__()
         self._img_size = img_size
@@ -25,7 +27,7 @@ class Automap(nn.Module):
             nn.ELU(),
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: Tensor) -> Tensor:
         x = self.layer1(x)
         x = self.layer2(x)
         x = x.view((x.size(0), 1, self._img_size, self._img_size))
