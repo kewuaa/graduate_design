@@ -3,8 +3,6 @@ import asyncio
 
 import cv2
 
-from ...logging import logger
-
 
 class Transformer:
     def __init__(
@@ -12,7 +10,7 @@ class Transformer:
         img_num: int,
         theta_step: float,
         start_angle: int = 0,
-        end_angle: int = 180
+        end_angle: int = 180,
     ) -> None:
         self._img_num = img_num
         self._theta_step = theta_step
@@ -33,7 +31,7 @@ class Transformer:
             norm=True,
         )
 
-    async def _transform(self, name):
+    async def _transform(self, name, refresh=None):
         img_file = self._source_path / name
         save_path = self._target_path / name
         while not img_file.exists():
@@ -54,15 +52,17 @@ class Transformer:
             str(save_path),
             sinogram
         )
+        if callable(refresh):
+            refresh()
 
-    async def transform(self) -> None:
+    async def transform(self, refresh=None) -> None:
         batch_size = 10
-        logger.info('making radon transform......')
         for i in range(0, self._img_num, batch_size):
             tasks = [
-                asyncio.create_task(self._transform(f'{i + j + 1}.png'))
+                asyncio.create_task(
+                    self._transform(f'{i + j + 1}.png', refresh)
+                )
                 for j in range(batch_size)
             ]
             for task in tasks:
                 await task
-        logger.info('transform done')

@@ -17,6 +17,7 @@ def train_model(model):
 
 
 if __name__ == "__main__":
+    logger.info('init data......')
     data.init(
         img_num,
         img_size,
@@ -26,8 +27,8 @@ if __name__ == "__main__":
         180 / projection_num,
     )
     logger.info('data successfully init at "./data"')
-    config = train_config.load()
-    print(config)
-    net = model.Automap(projection_num, img_size)
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    net.to(device)
+    # config = train_config.load()
+    # print(config)
+    # net = model.Automap(projection_num, img_size)
+    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    # net.to(device)
