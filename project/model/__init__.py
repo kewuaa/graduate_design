@@ -1,0 +1,1 @@
+from .automap import Automap

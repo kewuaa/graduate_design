@@ -1,3 +1,0 @@
-[file-run]
-command:python=$(+ml_pyenv) "$(VIM_FILEPATH)"
-cwd=<root>
