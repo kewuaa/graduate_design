@@ -19,9 +19,9 @@ class Transformer:
         self._start_angle = start_angle
         self._end_angle = end_angle
         self._loop = asyncio.get_event_loop()
-        self._source_path = Path('./project/data/imgs')
-        self._target_path = Path('./project/data/transformed_imgs')
-        self._target_path.mkdir(exist_ok=True)
+        self._source_path = Path('./data/imgs')
+        self._target_path = Path('./data/transformed_imgs')
+        self._target_path.mkdir(parents=True, exist_ok=True)
 
     def _radon(self, img):
         return cv2.ximgproc.RadonTransform(

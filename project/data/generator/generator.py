@@ -31,8 +31,8 @@ class Generator:
         )
         self._pixel_option = list(range(0, 128, 10))
         self._loop = asyncio.get_event_loop()
-        self._img_save_path = Path('./project/data/imgs')
-        self._img_save_path.mkdir(exist_ok=True)
+        self._img_save_path = Path('./data/imgs')
+        self._img_save_path.mkdir(parents=True, exist_ok=True)
 
     async def _generate_one(self, index: int) -> None:
         circles = await self._loop.run_in_executor(

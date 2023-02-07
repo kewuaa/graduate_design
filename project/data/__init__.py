@@ -11,6 +11,8 @@ def init(
     min_circle_size: int,
     max_circle_size: int,
     theta_step: float,
+    start_angle: int = 0,
+    end_angle: int = 180,
 ) -> None:
     async def main():
         gtask = loop.create_task(generator.generate())
@@ -24,6 +26,6 @@ def init(
         min_circle_size,
         max_circle_size
     )
-    transformer = Transformer(img_num, theta_step)
+    transformer = Transformer(img_num, theta_step, start_angle, end_angle)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())

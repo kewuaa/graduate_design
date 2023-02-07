@@ -1,5 +1,4 @@
 from torch import nn
-from torchinfo import summary
 import torch
 
 
@@ -32,8 +31,3 @@ class Automap(nn.Module):
         x = x.view((x.size(0), 1, self._img_size, self._img_size))
         x = self.layer3(x)
         return x
-
-
-if __name__ == "__main__":
-    net = Automap(140, 140)
-    summary(net, (1, 1, 140, 140))
