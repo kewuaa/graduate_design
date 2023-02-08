@@ -1,4 +1,16 @@
+[train]
 # epoch_num = 5
-batch_size = 100
+batch_size = 10
 learning_rate = 1e-5
 validation_percent = 0.1
+amp = true
+
+[data]
+image_num = 100
+image_size = 140
+max_circle_num = 3
+min_circle_size = 10
+max_circle_size = 30
+theta_step = 1.5
+# start_angle = 0
+# end_angle = 180

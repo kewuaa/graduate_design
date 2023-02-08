@@ -9,8 +9,8 @@ class Transformer:
         self,
         img_num: int,
         theta_step: float,
-        start_angle: int = 0,
-        end_angle: int = 180,
+        start_angle: int,
+        end_angle: int,
     ) -> None:
         self._img_num = img_num
         self._theta_step = theta_step

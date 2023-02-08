@@ -1,0 +1,3 @@
+[file-run]
+command:python=$(+pyenv) <root>/train.py
+cwd=<root>

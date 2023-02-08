@@ -1,27 +1,53 @@
-from pathlib import Path
+from functools import partial
+import asyncio
 
-from torch.utils import data
-import torch
-import cv2
+from rich.progress import Progress
+
+from .generator import Generator
+from .transformer import Transformer
 
 
-class Dataset(data.Dataset):
-    def __init__(self, images_dir: str, labels_dir: str, scale: float = 1.0):
-        self.scale = scale
-        self.images_dir = images_dir = Path(images_dir)
-        self.labels_dir = labels_dir = Path(labels_dir)
-        if not (images_dir.exists() and labels_dir.exists()):
-            raise RuntimeWarning('check you dir path')
-
-    def __getitem__(self, index):
-        pattern = f'{index}.*'
-        image_path = self.images_dir.glob(pattern)
-        label_path = self.labels_dir.glob(pattern)
-        if not (image_path and label_path):
-            raise RuntimeWarning('check index')
-        image = cv2.imread(str(image_path[0]), cv2.IMREAD_GRAYSCALE)
-        label = cv2.imread(str(label_path[0]), cv2.IMREAD_GRAYSCALE)
-        return {
-            'image': torch.as_tensor(image.copy()).float().contiguous(),
-            'mask': torch.as_tensor(label.copy()).float().contiguous(),
-        }
+def init(
+    img_num: int,
+    img_size: int,
+    max_circle_num: int,
+    min_circle_size: int,
+    max_circle_size: int,
+    theta_step: float,
+    start_angle: int,
+    end_angle: int,
+) -> None:
+    async def main():
+        progress = Progress()
+        generate_task = progress.add_task(
+            '[blue]generating',
+            total=img_num
+        )
+        transform_task = progress.add_task(
+            '[yellow]radon transformimg',
+            total=img_num
+        )
+        with progress:
+            gtask = loop.create_task(generator.generate(
+                refresh=partial(progress.update, generate_task, advance=1)
+            ))
+            ttask = loop.create_task(transformer.transform(
+                refresh=partial(progress.update, transform_task, advance=1)
+            ))
+            await gtask
+            await ttask
+    generator = Generator(
+        img_num,
+        img_size,
+        max_circle_num,
+        min_circle_size,
+        max_circle_size,
+    )
+    transformer = Transformer(
+        img_num,
+        theta_step,
+        start_angle,
+        end_angle,
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
