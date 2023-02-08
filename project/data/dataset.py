@@ -17,8 +17,11 @@ class Dataset(Dataset):
         self._refresh = None
         self._data_path = data_path = Path('./data')
         config_for_data = config.config_for_data
-        if not data_path.exists():
-            logger.info('not find data in path, initialize it...')
+        if not data_path.exists() or config_for_data.reinit:
+            if config_for_data.reinit:
+                logger.info('reinit data...')
+            else:
+                logger.info('not find data in path, initialize it...')
             loader.init(
                 config_for_data.image_num,
                 config_for_data.image_size,
@@ -94,6 +97,8 @@ class Dataset(Dataset):
         )
         if callable(self._refresh):
             self._refresh()
+        cv2.normalize(img, img, -0.5, 0.5, cv2.NORM_MINMAX)
+        cv2.normalize(label, label, -0.5, 0.5, cv2.NORM_MINMAX)
         return (
             np.expand_dims(img, axis=0).astype(np.float32),
             np.expand_dims(label, axis=0).astype(np.float32),

@@ -27,6 +27,7 @@ class DataConfig:
     theta_step: float = 0.
     start_angle: int = 0
     end_angle: int = 180
+    reinit: bool = False
 
     def __post_init__(self):
         if not self.theta_step:

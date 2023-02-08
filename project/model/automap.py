@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 from rich.progress import Progress
 
-from .base import BaseNet
+from .base import BaseNet, RegularizeLoss
 from ..data import Dataset
 from ..logging import logger
 from ..config import config_for_train, config_for_data
@@ -39,14 +39,20 @@ class Automap(BaseNet):
             nn.Tanh(),
             nn.Dropout(0.5),
         )
+        self._special_conv2d = nn.Conv2d(1, 32, 3, padding=1)
+        self._l1_regularizer = RegularizeLoss(1e-4, p=1)
         self.layer3 = nn.Sequential(
-            nn.Conv2d(1, 32, 3, padding=1),
+            self._special_conv2d,
             nn.ELU(),
             nn.Conv2d(32, 32, 3, padding=1),
             nn.ELU(),
             nn.ConvTranspose2d(32, 1, 3, padding=1),
             nn.ELU(),
         )
+
+    def to(self, device):
+        self._l1_regularizer.to(device)
+        return super().to(device)
 
     def forward(self, x: Tensor) -> Tensor:
         x = self.layer1(x)
@@ -59,6 +65,9 @@ class Automap(BaseNet):
         self.layer1 = utils.checkpoint(self.layer1)
         self.layer2 = utils.checkpoint(self.layer2)
         self.layer3 = utils.checkpoint(self.layer3)
+
+    def regularize_loss(self) -> Tensor:
+        return self._l1_regularizer(self._special_conv2d)
 
     def start_train(self, device: str = None) -> None:
         if device is None:
@@ -149,7 +158,7 @@ class Automap(BaseNet):
 
                     with autocast(device.type, enabled=amp):
                         pre = self(image)
-                        loss = loss_func(pre, label)
+                        loss = loss_func(pre, label) + self.regularize_loss()
                     loss_value = loss.item()
                     loss_meter.add(loss_value)
                     optimizer.zero_grad()
