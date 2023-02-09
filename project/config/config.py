@@ -19,12 +19,12 @@ class TrainConfig:
 
 @dataclass(order=False, eq=False)
 class DataConfig:
-    image_num: int
-    image_size: int
-    max_circle_num: int
-    min_circle_size: int
-    max_circle_size: int
+    image_num: int = 10000
+    image_size: int = 64
     min_circle_num: int = 1
+    max_circle_num: int = 3
+    min_circle_size: int = 6
+    max_circle_size: int = 16
     theta_step: float = 0.
     start_angle: int = 0
     end_angle: int = 180
