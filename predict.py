@@ -2,6 +2,7 @@ from pathlib import Path
 
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
+from skimage.transform import iradon
 import numpy as np
 
 from project import model
@@ -14,19 +15,19 @@ if __name__ == "__main__":
     net = model.Automap()
     net.load('./checkpoints/checkpoint_epoch_1.pth')
     with Dataset() as dataset:
-        loader = DataLoader(dataset, batch_size=1)
+        loader = DataLoader(dataset, batch_size=10)
         for image, label in loader:
             pre = net(image)
             break
 
-    image = image.detach().numpy()
-    pre = pre.detach().numpy()
-    label = label.detach().numpy()
+    image = np.squeeze(image.detach().numpy())
+    pre = np.squeeze(pre.detach().numpy())
+    # label = np.squeeze(label.detach().numpy())
+    label = iradon(image)
 
-    image = np.array(image)
-    ori_train = np.squeeze(image)
-    img_result_train = np.squeeze(pre)
-    reconstruction_fbp_train = np.squeeze(label)
+    ori_train = image
+    img_result_train = pre
+    reconstruction_fbp_train = label
 
     # plt.subplot(231), plt.imshow(ori_test, cmap='gray')
     # plt.title('Original test set'), plt.xticks([]), plt.yticks([])
