@@ -19,6 +19,11 @@ if __name__ == "__main__":
             pre = net(image)
             break
 
+    image = np.array(image)
+    pre = np.array(pre)
+    label = np.array(label)
+
+    image = np.array(image)
     ori_train = np.squeeze(image)
     img_result_train = np.squeeze(pre)
     reconstruction_fbp_train = np.squeeze(label)
