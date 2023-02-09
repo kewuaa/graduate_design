@@ -7,8 +7,9 @@ weight_decay = 0.0
 amp = true
 
 [data]
-image_num = 10000
+image_num = 100
 image_size = 64
+# min_circle_num = 1
 max_circle_num = 3
 min_circle_size = 6
 max_circle_size = 16

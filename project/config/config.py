@@ -24,6 +24,7 @@ class DataConfig:
     max_circle_num: int
     min_circle_size: int
     max_circle_size: int
+    min_circle_num: int = 1
     theta_step: float = 0.
     start_angle: int = 0
     end_angle: int = 180

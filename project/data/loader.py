@@ -10,6 +10,7 @@ from .transformer import Transformer
 def init(
     img_num: int,
     img_size: int,
+    min_circle_num: int,
     max_circle_num: int,
     min_circle_size: int,
     max_circle_size: int,
@@ -39,6 +40,7 @@ def init(
     generator = Generator(
         img_num,
         img_size,
+        min_circle_num,
         max_circle_num,
         min_circle_size,
         max_circle_size,

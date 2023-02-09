@@ -13,12 +13,14 @@ class Generator:
         self,
         img_num: int,
         img_size: int,
+        min_circle_num: int,
         max_circle_num: int,
         min_circle_size: int,
         max_circle_size: int,
     ) -> None:
         self._img_num = img_num
         self._img_size = img_size
+        self._min_circle_num = min_circle_num
         self._max_circle_num = max_circle_num
         self._Circle = circle.Circle(
             0.,
@@ -37,7 +39,7 @@ class Generator:
         circles = await self._loop.run_in_executor(
             None,
             self._Circle.generate,
-            random.randint(1, self._max_circle_num),
+            random.randint(self._min_circle_num, self._max_circle_num),
         )
         img = Image.new('L', (self._img_size, self._img_size), 255)
         draw = ImageDraw.Draw(img)
