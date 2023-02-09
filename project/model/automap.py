@@ -24,6 +24,7 @@ from ..utils.visdom import Visualizer
 class Automap(BaseNet):
     def __init__(self) -> None:
         super(Automap, self).__init__()
+        self._use_checkpoint = False
         self._img_size = img_size = config_for_data.image_size
         projection_num = \
             (config_for_data.end_angle - config_for_data.start_angle) \
@@ -55,13 +56,20 @@ class Automap(BaseNet):
         return super().to(device)
 
     def forward(self, x: Tensor) -> Tensor:
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = x.view((x.size(0), 1, self._img_size, self._img_size))
-        x = self.layer3(x)
+        if self._use_checkpoint:
+            x = checkpoint(self.layer1, x)
+            x = checkpoint(self.layer2, x)
+            x = x.view((x.size(0), 1, self._img_size, self._img_size))
+            x = checkpoint(self.layer3, x)
+        else:
+            x = self.layer1(x)
+            x = self.layer2(x)
+            x = x.view((x.size(0), 1, self._img_size, self._img_size))
+            x = self.layer3(x)
         return x
 
     def use_checkpoint(self):
+        self._use_checkpoint = True
         self.layer1 = partial(checkpoint, self.layer1)
         self.layer2 = partial(checkpoint, self.layer2)
         self.layer3 = partial(checkpoint, self.layer3)
