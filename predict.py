@@ -19,9 +19,9 @@ if __name__ == "__main__":
             pre = net(image)
             break
 
-    ori_train = image
+    ori_train = np.squeeze(image)
     img_result_train = np.squeeze(pre)
-    reconstruction_fbp_train = label
+    reconstruction_fbp_train = np.squeeze(label)
 
     # plt.subplot(231), plt.imshow(ori_test, cmap='gray')
     # plt.title('Original test set'), plt.xticks([]), plt.yticks([])
