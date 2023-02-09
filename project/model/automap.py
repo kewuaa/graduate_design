@@ -62,9 +62,9 @@ class Automap(BaseNet):
         return x
 
     def use_checkpoint(self):
-        self.layer1 = checkpoint(self.layer1)
-        self.layer2 = checkpoint(self.layer2)
-        self.layer3 = checkpoint(self.layer3)
+        self.layer1 = partial(checkpoint, self.layer1)
+        self.layer2 = partial(checkpoint, self.layer2)
+        self.layer3 = partial(checkpoint, self.layer3)
 
     def regularize_loss(self) -> Tensor:
         return self._l1_regularizer(self._special_conv2d)
