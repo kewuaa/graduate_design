@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from matplotlib import pyplot as plt
+import numpy as np
 import cv2
 
 from project import model
@@ -18,10 +19,10 @@ if __name__ == "__main__":
     label = cv2.imread(str(label), cv2.IMREAD_GRAYSCALE)
     image = cv2.normalize(image, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
     label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
-    pre = net(image)
+    pre = net(np.expand_dims(image, axis=0))
 
     ori_train = image
-    img_result_train = pre
+    img_result_train = np.squeeze(pre)
     reconstruction_fbp_train = label
 
     # plt.subplot(231), plt.imshow(ori_test, cmap='gray')
