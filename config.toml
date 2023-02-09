@@ -1,0 +1,19 @@
+[train]
+# epoch_num = 5
+batch_size = 50
+learning_rate = 2e-5
+validation_percent = 0.1
+weight_decay = 0.0
+amp = true
+
+[data]
+image_num = 100
+image_size = 64
+# min_circle_num = 1
+max_circle_num = 3
+min_circle_size = 6
+max_circle_size = 16
+theta_step = 1.5
+reinit = true
+# start_angle = 0
+# end_angle = 180

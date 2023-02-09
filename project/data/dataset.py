@@ -2,6 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 import threading
 import asyncio
+import shutil
 
 from torch.utils.data import Dataset
 import cv2
@@ -17,8 +18,13 @@ class Dataset(Dataset):
         self._refresh = None
         self._data_path = data_path = Path('./data')
         config_for_data = config.config_for_data
-        if not data_path.exists() or config_for_data.reinit:
+        while not data_path.exists() or config_for_data.reinit:
             if config_for_data.reinit:
+                if input(f'sure to remove {data_path.resolve()}(y/n):') == 'y':
+                    shutil.rmtree(str(data_path))
+                else:
+                    logger.info('reinit cancelled')
+                    break
                 logger.info('reinit data...')
             else:
                 logger.info('not find data in path, initialize it...')
@@ -34,6 +40,7 @@ class Dataset(Dataset):
                 config_for_data.end_angle,
             )
             logger.info('data successfully initialized')
+            break
         self._data = set()
         self._img_dir = self._data_path / 'transformed_imgs'
         self._label_dir = self._data_path / 'imgs'
