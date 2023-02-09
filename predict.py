@@ -3,7 +3,6 @@ from pathlib import Path
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 import numpy as np
-import cv2
 
 from project import model
 from project.data import Dataset
@@ -17,7 +16,7 @@ if __name__ == "__main__":
     with Dataset() as dataset:
         loader = DataLoader(dataset, batch_size=1)
         for image, label in loader:
-            pre = net(label)
+            pre = net(image)
             break
 
     ori_train = image
