@@ -62,9 +62,9 @@ class Automap(BaseNet):
         return x
 
     def use_checkpoint(self):
-        self.layer1 = utils.checkpoint(self.layer1)
-        self.layer2 = utils.checkpoint(self.layer2)
-        self.layer3 = utils.checkpoint(self.layer3)
+        self.layer1 = utils.checkpoint.checkpoint(self.layer1)
+        self.layer2 = utils.checkpoint.checkpoint(self.layer2)
+        self.layer3 = utils.checkpoint.checkpoint(self.layer3)
 
     def regularize_loss(self) -> Tensor:
         return self._l1_regularizer(self._special_conv2d)
@@ -153,8 +153,8 @@ class Automap(BaseNet):
                 for step, batch in enumerate(train_loader):
                     image, label = batch
                     size = image.size(0)
-                    image.to(device=device)
-                    label.to(device=device)
+                    image = image.to(device=device)
+                    label = label.to(device=device)
 
                     with autocast(device.type, enabled=amp):
                         pre = self(image)
@@ -186,8 +186,8 @@ class Automap(BaseNet):
         loss_meter = meter.AverageValueMeter()
         for step, batch in enumerate(dataloader):
             image, label = batch
-            image.to(device=device)
-            label.to(device=device)
+            image = image.to(device=device)
+            image = label.to(device=device)
 
             with autocast(device.type, enabled=amp):
                 pre = self(image)

@@ -97,11 +97,11 @@ class Dataset(Dataset):
         )
         if callable(self._refresh):
             self._refresh()
-        cv2.normalize(img, img, -0.5, 0.5, cv2.NORM_MINMAX)
-        cv2.normalize(label, label, -0.5, 0.5, cv2.NORM_MINMAX)
+        img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         return (
-            np.expand_dims(img, axis=0).astype(np.float32),
-            np.expand_dims(label, axis=0).astype(np.float32),
+            np.expand_dims(img, axis=0),
+            np.expand_dims(label, axis=0),
         )
 
     def _load_data(self):
