@@ -3,7 +3,6 @@ from functools import partial
 from torch import (
     nn,
     cuda,
-    utils,
     optim,
     Tensor,
     autocast,
@@ -11,6 +10,7 @@ from torch import (
     device as torch_device,
 )
 from torch.utils.data import DataLoader, random_split
+from torch.utils.checkpoint import checkpoint
 from torchnet import meter
 from rich.progress import Progress
 
@@ -62,9 +62,9 @@ class Automap(BaseNet):
         return x
 
     def use_checkpoint(self):
-        self.layer1 = utils.checkpoint.checkpoint(self.layer1)
-        self.layer2 = utils.checkpoint.checkpoint(self.layer2)
-        self.layer3 = utils.checkpoint.checkpoint(self.layer3)
+        self.layer1 = checkpoint(self.layer1)
+        self.layer2 = checkpoint(self.layer2)
+        self.layer3 = checkpoint(self.layer3)
 
     def regularize_loss(self) -> Tensor:
         return self._l1_regularizer(self._special_conv2d)
