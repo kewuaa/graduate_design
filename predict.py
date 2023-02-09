@@ -1,25 +1,24 @@
 from pathlib import Path
 
+from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 import numpy as np
 import cv2
 
 from project import model
+from project.data import Dataset
 image_dir = Path('./data/transformed_imgs')
 label_dir = Path('./data/imgs')
 
 
 if __name__ == "__main__":
-    img_n = 1
     net = model.Automap()
     net.load('./checkpoints/checkpoint_epoch_1.pth')
-    image = image_dir / f'{img_n}.png'
-    label = label_dir / f'{img_n}.png'
-    image = cv2.imread(str(image), cv2.IMREAD_GRAYSCALE)
-    label = cv2.imread(str(label), cv2.IMREAD_GRAYSCALE)
-    image = cv2.normalize(image, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
-    label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
-    pre = net(np.expand_dims(image, axis=0))
+    with Dataset() as dataset:
+        loader = DataLoader(dataset, batch_size=1)
+        for image, label in loader:
+            pre = net(label)
+            break
 
     ori_train = image
     img_result_train = np.squeeze(pre)
