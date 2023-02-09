@@ -18,7 +18,7 @@ if __name__ == "__main__":
     label = cv2.imread(str(label), cv2.IMREAD_GRAYSCALE)
     image = cv2.normalize(image, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
     label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
-    pre = model(image)
+    pre = net(image)
 
     ori_train = image
     img_result_train = pre
