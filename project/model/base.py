@@ -19,7 +19,7 @@ class BaseNet(torch.nn.Module):
             path = self._checkpoint_dir / time.strftime(
                 f'checkpoint_{name}.pth'
             )
-        torch.save(self, str(path))
+        torch.save(self.state_dict(), str(path))
 
 
 class RegularizeLoss(torch.nn.Module):
