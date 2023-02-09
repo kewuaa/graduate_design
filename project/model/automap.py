@@ -192,7 +192,7 @@ class Automap(BaseNet):
         for step, batch in enumerate(dataloader):
             image, label = batch
             image = image.to(device=device)
-            image = label.to(device=device)
+            label = label.to(device=device)
 
             with autocast(device.type, enabled=amp):
                 pre = self(image)
