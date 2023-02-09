@@ -20,8 +20,8 @@ if __name__ == "__main__":
             break
 
     image = image.detach().numpy()
-    pre = np.detach().numpy()
-    label = np.detach().numpy()
+    pre = pre.detach().numpy()
+    label = label.detach().numpy()
 
     image = np.array(image)
     ori_train = np.squeeze(image)
