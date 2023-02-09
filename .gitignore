@@ -1,6 +1,7 @@
 .pytest_cache/
 checkpoints/
 ./data/
+config.toml
 **/__pycache__/
 **/build/
 *.png
