@@ -19,9 +19,9 @@ if __name__ == "__main__":
             pre = net(image)
             break
 
-    image = np.array(image)
-    pre = np.array(pre)
-    label = np.array(label)
+    image = image.detach().numpy()
+    pre = np.detach().numpy()
+    label = np.detach().numpy()
 
     image = np.array(image)
     ori_train = np.squeeze(image)
