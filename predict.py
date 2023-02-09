@@ -20,9 +20,9 @@ if __name__ == "__main__":
             pre = net(image)
             break
 
-    image = np.squeeze(image.detach().numpy())
-    pre = np.squeeze(pre.detach().numpy())
-    # label = np.squeeze(label.detach().numpy())
+    image = np.squeeze(image.detach().numpy()[3, ...])
+    pre = np.squeeze(pre.detach().numpy()[3, ...])
+    # label = np.squeeze(label.detach().numpy()[3, ...])
     label = iradon(image)
 
     ori_train = image
