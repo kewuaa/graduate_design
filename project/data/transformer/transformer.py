@@ -8,9 +8,9 @@ class Transformer:
     def __init__(
         self,
         img_num: int,
-        theta_step: float,
         start_angle: int,
         end_angle: int,
+        theta_step: float,
         data_path: Path,
     ) -> None:
         self._img_num = img_num

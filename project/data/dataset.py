@@ -17,15 +17,7 @@ from ..logging import logger
 data_path = Path('./data')
 
 
-def init(
-    img_num: int,
-    img_size: int,
-    pixel: list,
-    circle_num: list,
-    circle_size: list,
-    theta_step: float,
-    angle: list,
-) -> None:
+def init(force=False) -> int:
     async def main():
         progress = Progress()
         generate_task = progress.add_task(
@@ -45,53 +37,62 @@ def init(
             ))
             await gtask
             await ttask
-    generator = Generator(
-        img_num,
-        img_size,
-        pixel,
-        circle_num,
-        circle_size,
-        data_path,
-    )
-    transformer = Transformer(
-        img_num,
-        theta_step,
-        *angle,
-        data_path,
-    )
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    config_for_data = config.config_for_data
+    img_num = config_for_data.image_num
+    img_size = config_for_data.image_size
+    pixel = config_for_data.pixel
+    circle_num = config_for_data.circle_num
+    circle_size = config_for_data.circle_size
+    angle = config_for_data.angle
+    theta_step = config_for_data.theta_step
+    assert len(pixel) == 3
+    assert len(circle_num) == 2
+    assert len(circle_size) == 2
+    assert len(angle) == 2
+    data_path_exist = data_path.exists()
+    while force or not data_path_exist or config_for_data.reinit:
+        if force or config_for_data.reinit:
+            if data_path_exist:
+                if input(
+                    f'"{data_path.resolve()}" already exists\n'
+                    'are you sure to remove it?(y/n):'
+                ) == 'y':
+                    shutil.rmtree(str(data_path))
+                else:
+                    logger.info('reinit cancelled')
+                    break
+            logger.info('reinit data...')
+        else:
+            logger.info('not find data in path, initialize it...')
+        generator = Generator(
+            img_num,
+            img_size,
+            pixel,
+            circle_num,
+            circle_size,
+            data_path,
+        )
+        transformer = Transformer(
+            img_num,
+            *angle,
+            theta_step,
+            data_path,
+        )
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())
+        logger.info('data successfully initialized')
+        break
+    return img_num
 
 
 class Dataset(Dataset):
     def __init__(self):
         self._refresh = None
-        config_for_data = config.config_for_data
-        while not data_path.exists() or config_for_data.reinit:
-            if config_for_data.reinit:
-                if input(f'sure to remove {data_path.resolve()}(y/n):') == 'y':
-                    shutil.rmtree(str(data_path))
-                else:
-                    logger.info('reinit cancelled')
-                    break
-                logger.info('reinit data...')
-            else:
-                logger.info('not find data in path, initialize it...')
-            init(
-                config_for_data.image_num,
-                config_for_data.image_size,
-                config_for_data.pixel,
-                config_for_data.circle_num,
-                config_for_data.circle_size,
-                config_for_data.theta_step,
-                config_for_data.angle,
-            )
-            logger.info('data successfully initialized')
-            break
         self._data = set()
         self._img_dir = data_path / 'transformed_imgs'
         self._label_dir = data_path / 'imgs'
-        self._length = config_for_data.image_num
+        data_num = init()
+        self._length = data_num
         self._loop = asyncio.new_event_loop()
         self._batch_size = config.config_for_train.batch_size
 

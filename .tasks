@@ -2,3 +2,7 @@
 command:python=$(+pyenv) <root>/train.py
 command:toml=$(+pyenv) <root>/train.py
 cwd=<root>
+
+[generate-data]
+command=$(+pyenv) -m project.data
+cwd=<root>

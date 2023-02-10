@@ -26,10 +26,10 @@ class Automap(BaseNet):
         super(Automap, self).__init__()
         self._use_checkpoint = False
         self._img_size = img_size = config_for_data.image_size
-        projection_num = \
-            (config_for_data.end_angle - config_for_data.start_angle) \
-            / config_for_data.theta_step
-        projection_num = int(projection_num)
+        projection_num = int(
+            (config_for_data.angle[1] - config_for_data.angle[0]) /
+            config_for_data.theta_step
+        )
         self.layer1 = nn.Sequential(
             nn.Flatten(),
             nn.Linear(img_size * projection_num, img_size * projection_num),
