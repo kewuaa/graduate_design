@@ -1,22 +1,71 @@
 from functools import lru_cache
+from functools import partial
 from pathlib import Path
 import threading
 import asyncio
 import shutil
 
 from torch.utils.data import Dataset
+from rich.progress import Progress
 import cv2
 import numpy as np
 
-from . import loader
+from .generator import Generator
+from .transformer import Transformer
 from .. import config
 from ..logging import logger
+data_path = Path('./data')
+
+
+def init(
+    img_num: int,
+    img_size: int,
+    pixel: list,
+    circle_num: list,
+    circle_size: list,
+    theta_step: float,
+    angle: list,
+) -> None:
+    async def main():
+        progress = Progress()
+        generate_task = progress.add_task(
+            '[blue]generating',
+            total=img_num
+        )
+        transform_task = progress.add_task(
+            '[yellow]radon transformimg',
+            total=img_num
+        )
+        with progress:
+            gtask = loop.create_task(generator.generate(
+                refresh=partial(progress.update, generate_task, advance=1)
+            ))
+            ttask = loop.create_task(transformer.transform(
+                refresh=partial(progress.update, transform_task, advance=1)
+            ))
+            await gtask
+            await ttask
+    generator = Generator(
+        img_num,
+        img_size,
+        pixel,
+        circle_num,
+        circle_size,
+        data_path,
+    )
+    transformer = Transformer(
+        img_num,
+        theta_step,
+        *angle,
+        data_path,
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
 
 
 class Dataset(Dataset):
     def __init__(self):
         self._refresh = None
-        self._data_path = data_path = Path('./data')
         config_for_data = config.config_for_data
         while not data_path.exists() or config_for_data.reinit:
             if config_for_data.reinit:
@@ -28,22 +77,20 @@ class Dataset(Dataset):
                 logger.info('reinit data...')
             else:
                 logger.info('not find data in path, initialize it...')
-            loader.init(
+            init(
                 config_for_data.image_num,
                 config_for_data.image_size,
-                config_for_data.min_circle_num,
-                config_for_data.max_circle_num,
-                config_for_data.min_circle_size,
-                config_for_data.max_circle_size,
+                config_for_data.pixel,
+                config_for_data.circle_num,
+                config_for_data.circle_size,
                 config_for_data.theta_step,
-                config_for_data.start_angle,
-                config_for_data.end_angle,
+                config_for_data.angle,
             )
             logger.info('data successfully initialized')
             break
         self._data = set()
-        self._img_dir = self._data_path / 'transformed_imgs'
-        self._label_dir = self._data_path / 'imgs'
+        self._img_dir = data_path / 'transformed_imgs'
+        self._label_dir = data_path / 'imgs'
         self._length = config_for_data.image_num
         self._loop = asyncio.new_event_loop()
         self._batch_size = config.config_for_train.batch_size

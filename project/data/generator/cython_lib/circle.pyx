@@ -48,7 +48,8 @@ cdef class Circle:
     cdef inline void generate_one(self, double[::1] circle) nogil:
         cdef:
             double size, padded_size, x, y
-        size = rand() % self.size_range + self.min_size
+        size = (rand() % self.size_range + self.min_size) \
+            if self.size_range != 0 else self.min_size
         padded_size = size + 2.0
         x = rand() % (self.width - 2 * padded_size) + self.left + padded_size
         y = rand() % (self.height - 2 * padded_size) + self.bottom + padded_size
@@ -63,7 +64,7 @@ cdef class Circle:
 
     cpdef list generate(self, int max_num):
         cdef:
-            double circles[3][3]
+            double circles[9][3]
             double[:, ::1] circles_view = circles
             double circle[3]
             double[::1] circle_view = circle
@@ -86,6 +87,5 @@ cdef class Circle:
                 (circles_view[i][0] - circles_view[i][2], circles_view[i][1] - circles_view[i][2]),
                 (circles_view[i][0] + circles_view[i][2], circles_view[i][1] + circles_view[i][2]),
             )
-            # c = (circles[i][0], circles[i][1], circles[i][2])
             es.append(c)
         return es

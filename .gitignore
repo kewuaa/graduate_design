@@ -2,6 +2,7 @@
 checkpoints/
 ./data/
 config.toml
+release/
 **/__pycache__/
 **/build/
 *.png

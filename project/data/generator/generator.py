@@ -13,38 +13,38 @@ class Generator:
         self,
         img_num: int,
         img_size: int,
-        min_circle_num: int,
-        max_circle_num: int,
-        min_circle_size: int,
-        max_circle_size: int,
+        pixel: list,
+        cirlce_num: list,
+        circle_size: list,
+        data_path: Path,
     ) -> None:
         self._img_num = img_num
         self._img_size = img_size
-        self._min_circle_num = min_circle_num
-        self._max_circle_num = max_circle_num
+        self._get_circle_num = partial(random.randint, *cirlce_num) \
+            if cirlce_num[0] != cirlce_num[1] else lambda: cirlce_num[0]
+        self._circle_num = cirlce_num
         self._Circle = circle.Circle(
             0.,
             img_size,
             0.,
             img_size,
-            min_circle_size,
-            max_circle_size
+            *circle_size
         )
-        self._pixel_option = list(range(0, 128, 10))
+        self._pixel = tuple(range(*pixel))
         self._loop = asyncio.get_event_loop()
-        self._img_save_path = Path('./data/imgs')
+        self._img_save_path = data_path / 'imgs'
         self._img_save_path.mkdir(parents=True, exist_ok=True)
 
     async def _generate_one(self, index: int, refresh=None) -> None:
         circles = await self._loop.run_in_executor(
             None,
             self._Circle.generate,
-            random.randint(self._min_circle_num, self._max_circle_num),
+            self._get_circle_num(),
         )
         img = Image.new('L', (self._img_size, self._img_size), 255)
         draw = ImageDraw.Draw(img)
         for c in circles:
-            alpha = random.choice(self._pixel_option)
+            alpha = random.choice(self._pixel)
             left_top, right_bottom = c
             draw.ellipse(
                 (left_top, right_bottom),

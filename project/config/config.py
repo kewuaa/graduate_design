@@ -21,13 +21,11 @@ class TrainConfig:
 class DataConfig:
     image_num: int = 10000
     image_size: int = 64
-    min_circle_num: int = 1
-    max_circle_num: int = 3
-    min_circle_size: int = 6
-    max_circle_size: int = 16
+    pixel: tuple = (0, 128, 10)
+    circle_num: tuple = (1, 3)
+    circle_size: tuple = (6, 16)
     theta_step: float = 0.
-    start_angle: int = 0
-    end_angle: int = 180
+    angle: tuple = (0, 180)
     reinit: bool = False
 
     def __post_init__(self):

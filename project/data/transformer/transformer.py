@@ -11,14 +11,15 @@ class Transformer:
         theta_step: float,
         start_angle: int,
         end_angle: int,
+        data_path: Path,
     ) -> None:
         self._img_num = img_num
         self._theta_step = theta_step
         self._start_angle = start_angle
         self._end_angle = end_angle
         self._loop = asyncio.get_event_loop()
-        self._source_path = Path('./data/imgs')
-        self._target_path = Path('./data/transformed_imgs')
+        self._source_path = data_path / 'imgs'
+        self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
 
     def _radon(self, img):

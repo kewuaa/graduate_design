@@ -1,2 +1,1 @@
-from .dataset import Dataset
-from .loader import init
+from .dataset import Dataset, init
