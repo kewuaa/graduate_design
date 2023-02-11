@@ -17,6 +17,7 @@ class Visualizer:
             logger.info('connect visdom server failed')
             logger.info('try to open the visdom server')
             cmd = f'start {sys.executable} -m visdom.server'
+            cmd = cmd.replace('Program Files', 'Progra~1')
             popen(cmd)
             try:
                 self._visdom = visdom.Visdom(env=env, raise_exceptions=True)
@@ -24,7 +25,6 @@ class Visualizer:
                 raise e
         cmd = 'start ' \
             f'{self._visdom.server}:{self._visdom.port}{self._visdom.base_url}'
-        cmd = cmd.replace('Program Files', 'Progra~1')
         popen(cmd)
         self._visdom.text('start logging......', win='logging')
 
