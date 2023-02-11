@@ -24,6 +24,7 @@ class Visualizer:
                 raise e
         cmd = 'start ' \
             f'{self._visdom.server}:{self._visdom.port}{self._visdom.base_url}'
+        cmd = cmd.replace('Program Files', 'Progra~1')
         popen(cmd)
         self._visdom.text('start logging......', win='logging')
 
