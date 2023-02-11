@@ -14,14 +14,15 @@ class Visualizer:
             logger.info('connecting visdom server')
             self._visdom = visdom.Visdom(env=env, raise_exceptions=True)
             logger.info('connect visdom server failed')
-        except Exception:
+        except ConnectionError:
             logger.info('try to open the visdom server')
             cmd = f'start {sys.executable} -m visdom.server'
             popen(cmd)
             try:
                 self._visdom = visdom.Visdom(env=env, raise_exceptions=True)
-            except Exception as e:
+            except ConnectionError as e:
                 raise e
+        popen(f'start {self._visdom.server}:{self._visdom.port}{self._visdom.base_url}')
         self._visdom.text('start logging......', win='logging')
 
     def plot(self, x, y, win: str):
