@@ -14,15 +14,17 @@ class Generator:
         img_num: int,
         img_size: int,
         pixel: list,
-        cirlce_num: list,
+        circle_num: list,
         circle_size: list,
         data_path: Path,
     ) -> None:
         self._img_num = img_num
         self._img_size = img_size
-        self._get_circle_num = partial(random.randint, *cirlce_num) \
-            if cirlce_num[0] != cirlce_num[1] else lambda: cirlce_num[0]
-        self._circle_num = cirlce_num
+        if len(set(circle_num)) == 1:
+            circle_num = circle_num[0]
+            self._circle_num = lambda: circle_num
+        else:
+            self._get_circle_num = partial(random.randint, *circle_num)
         self._Circle = circle.Circle(
             0.,
             img_size,
