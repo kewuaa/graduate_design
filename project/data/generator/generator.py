@@ -22,7 +22,7 @@ class Generator:
         self._img_size = img_size
         if len(set(circle_num)) == 1:
             circle_num = circle_num[0]
-            self._circle_num = lambda: circle_num
+            self._get_circle_num = lambda: circle_num
         else:
             self._get_circle_num = partial(random.randint, *circle_num)
         self._Circle = circle.Circle(
