@@ -1,12 +1,27 @@
+from os import popen
+import sys
 import time
 
 import visdom
 import numpy as np
 
+from ..logging import logger
+
 
 class Visualizer:
     def __init__(self, env: str = 'default'):
-        self._visdom = visdom.Visdom(env=env)
+        try:
+            logger.info('connecting visdom server')
+            self._visdom = visdom.Visdom(env=env, raise_exceptions=True)
+            logger.info('connect visdom server failed')
+        except Exception:
+            logger.info('try to open the visdom server')
+            cmd = f'start {sys.executable} -m visdom.server'
+            popen(cmd)
+            try:
+                self._visdom = visdom.Visdom(env=env, raise_exceptions=True)
+            except Exception as e:
+                raise e
         self._visdom.text('start logging......', win='logging')
 
     def plot(self, x, y, win: str):
