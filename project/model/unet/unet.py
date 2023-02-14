@@ -28,7 +28,7 @@ config = config.get('unet')
 
 
 class UNet(BaseNet):
-    def __init__(self, n_classes, scale: 0.5, bilinear=False):
+    def __init__(self, n_classes, scale: float = 0.5, bilinear=False):
         super(UNet, self).__init__()
         self.n_classes = n_classes
         self._dataset = Dataset(
@@ -347,20 +347,24 @@ class UNet(BaseNet):
 
     def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)
+        pre = self.predict(img, process=False)
+        img = img.squeeze().numpy()
+        label = label.squeeze().numpy()
+        img = cv2.resize(img, self._origin_size)
+        label = cv2.resize(label, self._origin_size)
+        return img, label, pre
+
+    def predict(self, img, process: bool = True):
+        if process:
+            img = (cv2.resize(img, self._new_size) / 255).astype(np.float32)
+            img = Tensor(np.expand_dims(img, axis=0)).contiguous()
         pre = self(img)
         pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
             pre = sigmoid(pre) > 0.5
-        img = img.squeeze().numpy()
-        label = label.squeeze().numpy()
         pre = pre.squeeze().numpy()
-        img = cv2.resize(img, self._origin_size)
-        label = cv2.resize(label, self._origin_size)
         for i, v in enumerate(self._unique_values):
             pre[pre == i] = v
-        return (img, label, pre)
-
-    def predict(self, img):
-        pass
+        return pre

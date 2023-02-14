@@ -1,5 +1,4 @@
 from matplotlib import pyplot as plt
-from skimage.transform import iradon
 
 from project import model
 
