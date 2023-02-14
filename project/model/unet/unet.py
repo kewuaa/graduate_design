@@ -77,8 +77,8 @@ class UNet(BaseNet):
 
     def pre_process(self, data: tuple):
         img, label = data
-        img = cv2.resize(img, self._new_size)
-        label = cv2.resize(label, self._new_size)
+        img = cv2.resize(img, self._new_size, None, 0., 0., cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
         if not hasattr(self, '_unique_values'):
             self._unique_values = np.unique(label)
         for i, v in enumerate(self._unique_values):
@@ -350,8 +350,8 @@ class UNet(BaseNet):
         pre = self.predict(img, process=False)
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
-        img = cv2.resize(img, self._origin_size)
-        label = cv2.resize(label, self._origin_size)
+        img = cv2.resize(img, self._origin_size, None, 0., 0., cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._origin_size, None, 0., 0., cv2.INTER_NEAREST)
         return img, label, pre
 
     def predict(self, img, process: bool = True):
