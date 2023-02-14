@@ -2,14 +2,6 @@
 # down here are the available item
 
 
-[train] # config for train part
-epoch_num = 5
-batch_size = 50
-learning_rate = 2e-5
-validation_percent = 0.1
-weight_decay = 0.0
-amp = true
-
 [data] # config for data part
 image_num = 100
 image_size = 64
@@ -19,3 +11,12 @@ circle_size = [6, 16]
 theta_step = 1.5
 angle = [0, 180]
 reinit = false
+
+[automap] # config for automap
+batch_size = 50
+learning_rate = 2e-5
+weight_decay = 0.0
+
+[unet] # config for unet
+batch_size = 50
+learning_rate = 1e-5
