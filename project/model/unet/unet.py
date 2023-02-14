@@ -360,7 +360,7 @@ class UNet(BaseNet):
                 img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
             img = (cv2.resize(img, self._new_size) / 255).astype(np.float32)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous()
-            img = img.squeeze(0)
+            img = img.unsqueeze(0)
         pre = self(img)
         pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:
