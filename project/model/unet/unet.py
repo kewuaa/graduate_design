@@ -228,6 +228,7 @@ class UNet(BaseNet):
                         pre = self(image)
                         if self.n_classes == 1:
                             pre = pre.squeeze(1)
+                            label = label.float()
                             loss = loss_func(pre, label)
                             loss += self._dice_loss(
                                 sigmoid(pre),
@@ -237,9 +238,9 @@ class UNet(BaseNet):
                         else:
                             loss = loss_func(pre, label)
                             loss += self._dice_loss(
-                                nn.functional.softmax(pre, dim=1),
+                                nn.functional.softmax(pre, dim=1).float(),
                                 nn.functional.one_hot(label, self.n_classes) \
-                                    .permute(0, 3, 1, 2),
+                                    .permute(0, 3, 1, 2).float(),
                                 multiclass=True,
                             )
                     loss_value = loss.item()
