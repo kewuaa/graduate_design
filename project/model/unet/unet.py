@@ -311,6 +311,7 @@ class UNet(BaseNet):
                         reduce_batch_first=False
                     )
                 else:
+                    label = label.long()
                     # convert to one-hot format
                     label = nn.functional.one_hot(
                         label,

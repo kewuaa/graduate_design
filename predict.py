@@ -6,7 +6,7 @@ from project import model
 
 if __name__ == "__main__":
     # net = model.Automap()
-    net = model.UNet(1)
+    net = model.UNet(3)
     net.load('./checkpoints/checkpoint_unet_epoch_5.pth')
     img, label, pre = net.predict(3)
     plt.subplot(131)
