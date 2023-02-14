@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+import cv2
 
 from project import model
 
@@ -16,6 +17,7 @@ if __name__ == "__main__":
     plt.imshow(pre, cmap='gray')
     plt.show()
     img = r
+    img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
     pre = net.predict(img)
     plt.subplot(121)
     plt.imshow(img, cmap='gray')
