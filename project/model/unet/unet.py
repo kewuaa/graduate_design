@@ -236,6 +236,7 @@ class UNet(BaseNet):
                                 multiclass=False,
                             )
                         else:
+                            label = label.long()
                             loss = loss_func(pre, label)
                             loss += self._dice_loss(
                                 nn.functional.softmax(pre, dim=1).float(),
