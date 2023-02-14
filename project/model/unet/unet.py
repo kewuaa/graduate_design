@@ -291,14 +291,14 @@ class UNet(BaseNet):
         dice_score = 0
 
         # iterate over the validation set
-        with autocast(device.type, enabled=amp):
-            for batch in dataloader:
-                image, label = batch
+        for batch in dataloader:
+            image, label = batch
 
-                # move images and labels to correct device and type
-                image = image.to(device=device)
-                label = label.to(device=device)
+            # move images and labels to correct device and type
+            image = image.to(device=device, memory_format=channels_last)
+            label = label.to(device=device)
 
+            with autocast(device.type, enabled=amp):
                 # predict the mask
                 pre = self(image)
 
@@ -316,16 +316,17 @@ class UNet(BaseNet):
                         label,
                         self.n_classes
                     ).permute(0, 3, 1, 2).float()
-                    pre = nn.functional.one_hot(pre.argmax(
-                        dim=1
-                    ), self.n_classes).permute(0, 3, 1, 2).float()
+                    pre = nn.functional.one_hot(
+                        pre.argmax(dim=1),
+                        self.n_classes
+                    ).permute(0, 3, 1, 2).float()
                     # compute the Dice score, ignoring background
                     dice_score += self.__multiclass_dice_coeff(
                         pre[:, 1:],
                         label[:, 1:],
                         reduce_batch_first=False
                     )
-                refresh(advance=image.size(0))
+            refresh(advance=image.size(0))
         self.train()
         return dice_score / max(num_val_batches, 1)
 
