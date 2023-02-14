@@ -15,3 +15,10 @@ if __name__ == "__main__":
     plt.subplot(133)
     plt.imshow(pre, cmap='gray')
     plt.show()
+    img = r
+    pre = net.predict(img)
+    plt.subplot(121)
+    plt.imshow(img, cmap='gray')
+    plt.subplot(122)
+    plt.imshow(pre, cmap='gray')
+    plt.show()
