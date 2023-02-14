@@ -80,7 +80,7 @@ class UNet(BaseNet):
         for i, v in enumerate(self._unique_values):
             label[label == v] = i
         img = (img / 255).astype(np.float32)
-        return np.expand_dims(img, axis=0), label
+        return np.expand_dims(img, axis=0), label.astype(np.int64)
 
     def __dice_coeff(
         self,
