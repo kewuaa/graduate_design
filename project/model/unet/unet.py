@@ -337,6 +337,6 @@ class UNet(BaseNet):
             pre = sigmoid(pre) > 0.5
         return (
             img.squeeze().numpy(),
-            label.numpy(),
+            label.squeeze().numpy(),
             pre.squeeze().numpy(),
         )
