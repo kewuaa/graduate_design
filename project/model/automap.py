@@ -1,34 +1,39 @@
 from functools import partial
 
+import cv2
+import numpy as np
+from rich.progress import Progress
 from torch import (
-    nn,
-    cuda,
-    optim,
     Tensor,
     autocast,
+    cuda,
     inference_mode,
-    device as torch_device,
+    nn,
+    optim,
 )
+from torch.utils import checkpoint
 from torch.utils.data import DataLoader, random_split
-from torch.utils.checkpoint import checkpoint
 from torchnet import meter
-from rich.progress import Progress
 
-from .base import BaseNet, RegularizeLoss
+from .. import config
 from ..data import Dataset
-from ..logging import logger
-from ..config import config_for_train, config_for_data
 from ..utils.visdom import Visualizer
+from .base import BaseNet, RegularizeLoss
+
+config = config.get('automap')
 
 
 class Automap(BaseNet):
     def __init__(self) -> None:
         super(Automap, self).__init__()
-        self._use_checkpoint = False
-        self._img_size = img_size = config_for_data.image_size
+        self._dataset = Dataset(
+            config.batch_size,
+            pre_process=self.pre_process
+        )
+        self._img_size = img_size = self._dataset.img_size
         projection_num = int(
-            (config_for_data.angle[1] - config_for_data.angle[0]) /
-            config_for_data.theta_step
+            (self._dataset.angle[1] - self._dataset.angle[0]) /
+            self._dataset.theta_step
         )
         self.layer1 = nn.Sequential(
             nn.Flatten(),
@@ -56,44 +61,42 @@ class Automap(BaseNet):
         return super().to(device)
 
     def forward(self, x: Tensor) -> Tensor:
-        if self._use_checkpoint:
-            x = checkpoint(self.layer1, x)
-            x = checkpoint(self.layer2, x)
-            x = x.view((x.size(0), 1, self._img_size, self._img_size))
-            x = checkpoint(self.layer3, x)
-        else:
-            x = self.layer1(x)
-            x = self.layer2(x)
-            x = x.view((x.size(0), 1, self._img_size, self._img_size))
-            x = self.layer3(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = x.view((x.size(0), 1, self._img_size, self._img_size))
+        x = self.layer3(x)
         return x
 
     def use_checkpoint(self):
-        self._use_checkpoint = True
+        self.layer1 = checkpoint(self.layer1)
+        self.layer2 = checkpoint(self.layer2)
+        self.layer3 = checkpoint(self.layer3)
 
     def regularize_loss(self) -> Tensor:
         return self._l1_regularizer(self._special_conv2d)
 
+    def pre_process(self, data: tuple):
+        img, label = data
+        img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
+
     def start_train(self, device: str = None) -> None:
-        if device is None:
-            device = 'cuda' if cuda.is_available() else 'cpu'
-        elif device == 'cuda':
-            if not cuda.is_available():
-                logger.warn('cuda is not available in your computer')
-                device = 'cpu'
-        device = torch_device(device)
+        super().start_train(device)
+        device = self._device
         self.to(device)
 
         # load config
-        epoch_num = config_for_train.epoch_num
-        batch_size = config_for_train.batch_size
-        validation_percent = config_for_train.validation_percent
-        learning_rate = config_for_train.learning_rate
-        weight_decay = config_for_train.weight_decay
-        amp = config_for_train.amp and device.type == 'cuda'
+        epoch_num = config.epoch_num
+        batch_size = config.batch_size
+        validation_percent = config.validation_percent
+        learning_rate = config.learning_rate
+        weight_decay = config.weight_decay
+        alpha = config.alpha
+        amp = config.amp and device.type == 'cuda'
 
         # 1. Create dataset
-        dataset = Dataset()
+        dataset = self._dataset
 
         # 2. Split into train / validation partitions
         length = len(dataset)
@@ -113,10 +116,10 @@ class Automap(BaseNet):
         optimizer = optim.RMSprop(
             self.parameters(),
             lr=learning_rate,
-            alpha=0.9,
+            alpha=alpha,
             weight_decay=weight_decay
         )
-        # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
+        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
         grad_scaler = cuda.amp.GradScaler(enabled=amp)
         loss_func = nn.MSELoss()
 
@@ -145,6 +148,11 @@ class Automap(BaseNet):
                 '',
                 total=train_set_num
             )
+            evaluate_task = progress.add_task(
+                '',
+                total=validate_set_num,
+                visible=False
+            )
 
             self.train()
             for epoch in range(1, epoch_num + 1):
@@ -170,23 +178,36 @@ class Automap(BaseNet):
                     grad_scaler.scale(loss).backward()
                     grad_scaler.step(optimizer)
                     grad_scaler.update()
+                    if step % 3 == 0:
+                        scheduler.step()
 
                     progress.update(train_task, advance=size)
                     visualizer.plot(step, loss_value, f'epoch {epoch}')
                 progress.update(epoch_task, advance=1)
                 average_loss, std_loss = loss_meter.value()
 
-                evaluate_loss = self.evaluate(validate_loader, device, amp)
+                progress.update(
+                    evaluate_task,
+                    description=f'validation of epoch {epoch}',
+                    visible=True
+                )
+                evaluate_loss = self.evaluate(
+                    validate_loader,
+                    device,
+                    amp,
+                    refresh=partial(progress.update, evaluate_task)
+                )
+                progress.update(evaluate_task, visible=False)
                 visualizer.log(f'''
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}<br>
                     ----evaluate loss : {evaluate_loss}
                 ''')
                 # scheduler.step(metrics)
-                self.save(f'epoch_{epoch}')
+                self.save(f'automap_epoch_{epoch}')
 
     @inference_mode()
-    def evaluate(self, dataloader, device, amp):
+    def evaluate(self, dataloader, device, amp, refresh):
         self.eval()
         loss_meter = meter.AverageValueMeter()
         for step, batch in enumerate(dataloader):
@@ -198,6 +219,16 @@ class Automap(BaseNet):
                 pre = self(image)
                 loss = nn.functional.mse_loss(pre, label)
             loss_meter.add(loss.item())
+            refresh(advance=image.size(0))
         average_loss, std_loss = loss_meter.value()
         self.train()
         return average_loss
+
+    def predict(self, index: int = None):
+        img, label = self._dataset.load_one(index)
+        pre = self(img)
+        return (
+            img.squeeze().numpy(),
+            label.squeeze().numpy(),
+            pre.squeeze().numpy(),
+        )

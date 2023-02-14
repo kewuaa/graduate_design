@@ -3,10 +3,13 @@ import time
 
 import torch
 
+from ..logging import logger
+
 
 class BaseNet(torch.nn.Module):
     def __init__(self) -> None:
         super().__init__()
+        self._device = 'cpu'
         self._checkpoint_dir = Path('./checkpoints')
         self._checkpoint_dir.mkdir(exist_ok=True)
 
@@ -20,6 +23,21 @@ class BaseNet(torch.nn.Module):
                 f'checkpoint_{name}.pth'
             )
         torch.save(self.state_dict(), str(path))
+
+    def start_train(self, device: str = None):
+        if device is None:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        elif device == 'cuda':
+            if not torch.cuda.is_available():
+                logger.warn('cuda is not available in your computer')
+                device = 'cpu'
+        self._device = torch.device(device)
+
+    def evaluate(self, dataloader, device, amp, refresh):
+        pass
+
+    def predict(self, index: int = None):
+        pass
 
 
 class RegularizeLoss(torch.nn.Module):

@@ -8,16 +8,6 @@ except ImportError:
 
 
 @dataclass(order=False, eq=False)
-class TrainConfig:
-    epoch_num: int = 5
-    batch_size: int = 1
-    learning_rate: float = 1e-5
-    validation_percent: float = 0.1
-    weight_decay: float = 1e-8
-    amp: bool = False
-
-
-@dataclass(order=False, eq=False)
 class DataConfig:
     image_num: int = 10000
     image_size: int = 64
@@ -33,13 +23,42 @@ class DataConfig:
             self.theta_step = 180 / self.image_size
 
 
-config_file = Path('./config.toml')
-config = {
-    'train': {},
+@dataclass(order=False, eq=False)
+class ModelConfig:
+    epoch_num: int = 5
+    batch_size: int = 1
+    learning_rate: float = 1e-5
+    validation_percent: float = 0.1
+    weight_decay: float = 1e-8
+    amp: bool = True
+
+
+@dataclass(order=False, eq=False)
+class AutomapConfig(ModelConfig):
+    alpha: float = 0.9
+
+
+@dataclass(order=False, eq=False)
+class UnetConfig(ModelConfig):
+    momentum: float = 1.
+    gradient_clipping: float = 1.
+
+
+__config_file = Path('./config.toml')
+__config = {
     'data': {},
+    'automap': {},
+    'unet': {},
 }
-if config_file.exists():
-    with open(config_file) as f:
-        config = toml.load(f)
-config_for_train = TrainConfig(**config['train'])
-config_for_data = DataConfig(**config['data'])
+if __config_file.exists():
+    with open(__config_file) as f:
+        __config = toml.load(f)
+__config = {
+    'data': DataConfig(**__config['data']),
+    'automap': AutomapConfig(**__config['automap']),
+    'unet': UnetConfig(**__config['unet'])
+}
+
+
+def get(type_: str) -> dict:
+    return __config.get(type_)

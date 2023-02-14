@@ -1,6 +1,5 @@
-[file-run]
-command:python=$(+pyenv) <root>/train.py
-command:toml=$(+pyenv) <root>/train.py
+[train-model]
+command=$(+pyenv) train.py
 cwd=<root>
 
 [generate-data]

@@ -1,19 +1,21 @@
-from functools import lru_cache
-from functools import partial
-from pathlib import Path
-import threading
 import asyncio
+import random
 import shutil
+import threading
+from functools import lru_cache, partial
+from pathlib import Path
 
-from torch.utils.data import Dataset
-from rich.progress import Progress
 import cv2
 import numpy as np
+from rich.progress import Progress
+from torch import Tensor
+from torch.utils.data import Dataset
 
-from .generator import Generator
-from .transformer import Transformer
 from .. import config
 from ..logging import logger
+from .generator import Generator
+from .transformer import Transformer
+
 data_path = Path('./data')
 
 
@@ -37,7 +39,7 @@ def init(force=False) -> int:
             ))
             await gtask
             await ttask
-    config_for_data = config.config_for_data
+    config_for_data = config.get('data')
     img_num = config_for_data.image_num
     img_size = config_for_data.image_size
     pixel = config_for_data.pixel
@@ -82,19 +84,19 @@ def init(force=False) -> int:
         loop.run_until_complete(main())
         logger.info('data successfully initialized')
         break
-    return img_num
+    return img_num, img_size, angle, theta_step
 
 
 class Dataset(Dataset):
-    def __init__(self):
+    def __init__(self, batch_size: int, pre_process=None):
         self._refresh = None
         self._data = set()
         self._img_dir = data_path / 'transformed_imgs'
         self._label_dir = data_path / 'imgs'
-        data_num = init()
-        self._length = data_num
+        self._length, self.img_size, self.angle, self.theta_step = init()
         self._loop = asyncio.new_event_loop()
-        self._batch_size = config.config_for_train.batch_size
+        self._batch_size = batch_size
+        self._pre_process = pre_process
 
     def add_refresh(self, refresh) -> None:
         if not callable(refresh):
@@ -151,13 +153,27 @@ class Dataset(Dataset):
             str(self._label_dir / name),
             cv2.IMREAD_GRAYSCALE
         )
+        if self._pre_process is not None:
+            img, label = self._pre_process((img, label))
         if callable(self._refresh):
             self._refresh()
-        img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-        label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         return (
-            np.expand_dims(img, axis=0),
-            np.expand_dims(label, axis=0),
+            Tensor(img).contiguous(),
+            Tensor(label).contiguous(),
+        )
+
+    def load_one(self, index: int = None):
+        if index > self._length:
+            raise IndexError('index out of range')
+        index = index or random.randint(1, self._length)
+        name = f'{index}.png'
+        img = cv2.imread(str(self._img_dir / name), cv2.IMREAD_GRAYSCALE)
+        label = cv2.imread(str(self._label_dir / name), cv2.IMREAD_GRAYSCALE)
+        if self._pre_process is not None:
+            img, label = self._pre_process((img, label))
+        return (
+            Tensor(np.expand_dims(img, axis=0)),
+            Tensor(np.expand_dims(label, axis=0)),
         )
 
     def _load_data(self):
