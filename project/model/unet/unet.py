@@ -36,7 +36,7 @@ class UNet(BaseNet):
             pre_process=self.pre_process
         )
         self._origin_size = (self._dataset.img_size,) * 2
-        self._new_size = (self._dataset.img_size * scale,) * 2
+        self._new_size = (int(self._dataset.img_size * scale),) * 2
 
         self.inc = (DoubleConv(1, 64))
         self.down1 = (Down(64, 128))
