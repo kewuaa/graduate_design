@@ -224,7 +224,7 @@ class Automap(BaseNet):
         self.train()
         return average_loss
 
-    def predict(self, index: int = None):
+    def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)
         pre = self(img)
         return (

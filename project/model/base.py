@@ -1,5 +1,4 @@
 from pathlib import Path
-import time
 
 import torch
 
@@ -17,11 +16,8 @@ class BaseNet(torch.nn.Module):
         state_dict = torch.load(path)
         self.load_state_dict(state_dict)
 
-    def save(self, name: str, path: Path = None) -> None:
-        if path is None:
-            path = self._checkpoint_dir / time.strftime(
-                f'checkpoint_{name}.pth'
-            )
+    def save(self, name: str) -> None:
+        path = self._checkpoint_dir / f'checkpoint_{name}.pth'
         torch.save(self.state_dict(), str(path))
 
     def start_train(self, device: str = None):

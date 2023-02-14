@@ -2,6 +2,7 @@ from functools import partial
 
 import cv2
 import numpy as np
+import torch
 from rich.progress import Progress
 from torch import (
     Tensor,
@@ -27,13 +28,15 @@ config = config.get('unet')
 
 
 class UNet(BaseNet):
-    def __init__(self, n_classes, bilinear=False):
+    def __init__(self, n_classes, scale: 0.5, bilinear=False):
         super(UNet, self).__init__()
         self.n_classes = n_classes
         self._dataset = Dataset(
             config.batch_size,
             pre_process=self.pre_process
         )
+        self._origin_size = (self._dataset.img_size,) * 2
+        self._new_size = (self._dataset.img_size * scale,) * 2
 
         self.inc = (DoubleConv(1, 64))
         self.down1 = (Down(64, 128))
@@ -74,7 +77,8 @@ class UNet(BaseNet):
 
     def pre_process(self, data: tuple):
         img, label = data
-        img = cv2.resize(img, label.shape)
+        img = cv2.resize(img, self._new_size)
+        label = cv2.resize(label, self._new_size)
         if not hasattr(self, '_unique_values'):
             self._unique_values = np.unique(label)
         for i, v in enumerate(self._unique_values):
@@ -123,6 +127,16 @@ class UNet(BaseNet):
         # Dice loss (objective to minimize) between 0 and 1
         fn = self.__multiclass_dice_coeff if multiclass else self.__dice_coeff
         return 1 - fn(input, target, reduce_batch_first=True)
+
+    def load(self, path) -> None:
+        state_dict = torch.load(path)
+        self._unique_values = state_dict.pop('unique_values')
+        self.load_state_dict(state_dict)
+
+    def save(self, name):
+        state_dict = self.state_dict()
+        state_dict['unique_values'] = self._unique_values
+        torch.save(state_dict, self._checkpoint_dir / f'checkpoint_{name}.pth')
 
     def start_train(self, device: str = None):
         super().start_train(device)
@@ -331,16 +345,22 @@ class UNet(BaseNet):
         self.train()
         return dice_score / max(num_val_batches, 1)
 
-    def predict(self, index: int = None):
+    def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)
         pre = self(img)
-        # pre = nn.functional.interpolate(pre)
+        pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
             pre = sigmoid(pre) > 0.5
-        return (
-            img.squeeze().numpy(),
-            label.squeeze().numpy(),
-            pre.squeeze().numpy(),
-        )
+        img = img.squeeze().numpy()
+        label = label.squeeze().numpy()
+        pre = pre.squeeze().numpy()
+        img = cv2.resize(img, self._origin_size)
+        label = cv2.resize(label, self._origin_size)
+        for i, v in enumerate(self._unique_values):
+            pre[pre == i] = v
+        return (img, label, pre)
+
+    def predict(self, img):
+        pass

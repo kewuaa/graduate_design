@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # net = model.Automap()
     net = model.UNet(3)
     net.load('./checkpoints/checkpoint_unet_epoch_5.pth')
-    img, label, pre = net.predict(3)
+    img, label, pre = net.validate(3)
     plt.subplot(131)
     plt.imshow(img, cmap='gray')
     plt.subplot(132)
