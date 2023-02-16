@@ -24,13 +24,15 @@ config = config.get('automap')
 
 
 class Automap(BaseNet):
-    def __init__(self) -> None:
+    def __init__(self, scale: float = 1.) -> None:
         super().__init__()
         self._dataset = Dataset(
             config.batch_size,
             pre_process=self.pre_process
         )
         self._img_size = img_size = self._dataset.img_size
+        self._origin_size = (img_size,) * 2
+        self._new_size = (img_size * scale) * 2
         projection_num = int(
             (self._dataset.angle[1] - self._dataset.angle[0]) /
             self._dataset.theta_step
@@ -77,6 +79,8 @@ class Automap(BaseNet):
 
     def pre_process(self, data: tuple):
         img, label = data
+        img = cv2.resize(img, self._new_size, None, 0, 0, cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._new_size, None, 0, 0, cv2.INTER_NEAREST)
         img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
@@ -229,6 +233,8 @@ class Automap(BaseNet):
         pre = self.predict(img, process=False)
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
+        img = cv2.resize(img, self._origin_size, None, 0, 0, cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._origin_size, None, 0, 0, cv2.INTER_NEAREST)
         return img, label, pre
 
     @inference_mode()
@@ -236,7 +242,9 @@ class Automap(BaseNet):
         if process:
             if type(img) is str:
                 img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+            img = cv2.resize(img, self._new_size, None, 0, 0, cv2.INTER_CUBIC)
             img = cv2.normalize(img, None, -0.5, 0.5, cv2.CV_32F)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous().unsqueeze(0)
         pre = self(img)
-        return pre.squeeze().numpy()
+        pre = pre.squeeze().numpy()
+        return cv2.resize(pre, self._origin_size, None, 0, 0, cv2.INTER_NEAREST)
