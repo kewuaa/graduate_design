@@ -231,6 +231,7 @@ class Automap(BaseNet):
         label = label.squeeze().numpy()
         return img, label, pre
 
+    @inference_mode()
     def predict(self, img, process: bool = True):
         if process:
             if type(img) is str:

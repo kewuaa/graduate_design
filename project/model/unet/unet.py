@@ -354,6 +354,7 @@ class UNet(BaseNet):
         label = cv2.resize(label, self._origin_size, None, 0., 0., cv2.INTER_NEAREST)
         return img, label, pre
 
+    @inference_mode()
     def predict(self, img, process: bool = True):
         if process:
             if type(img) is str:
