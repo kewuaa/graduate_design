@@ -16,7 +16,6 @@ class DataConfig:
     circle_size: tuple = (6, 16)
     theta_step: float = 0.
     angle: tuple = (0, 180)
-    norm: tuple = ()
     reinit: bool = False
 
     def __post_init__(self):

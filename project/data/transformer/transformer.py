@@ -11,14 +11,12 @@ class Transformer:
         start_angle: int,
         end_angle: int,
         theta_step: float,
-        norm: list,
         data_path: Path,
     ) -> None:
         self._img_num = img_num
         self._theta_step = theta_step
         self._start_angle = start_angle
         self._end_angle = end_angle
-        self._norm = norm
         self._loop = asyncio.get_event_loop()
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
@@ -27,9 +25,8 @@ class Transformer:
     def _radon(self, img):
         if self._norm:
             img = cv2.normalize(
-                img,
-                None,
-                *self._norm,
+                img, None,
+                -0.5, 0.5,
                 cv2.NORM_MINMAX,
                 cv2.CV_32F
             )

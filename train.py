@@ -5,7 +5,7 @@ from project import model
 
 if __name__ == "__main__":
     # net = model.Automap()
-    net = model.UNet(1)
+    net = model.UNet(3)
     try:
         net.start_train()
     except torch.cuda.OutOfMemoryError:
