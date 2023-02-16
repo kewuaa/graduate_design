@@ -246,7 +246,7 @@ class Automap(BaseNet):
         if process:
             if type(img) is str:
                 img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
-            img = cv2.resize(img, self._new_size, None, 0, 0, cv2.INTER_CUBIC)
+            img = cv2.resize(img, self._new_img_size, None, 0, 0, cv2.INTER_CUBIC)
             img = cv2.normalize(img, None, -0.5, 0.5, cv2.CV_32F)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous().unsqueeze(0)
         pre = self(img)

@@ -5,10 +5,10 @@ from project import model
 
 
 if __name__ == "__main__":
-    # net = model.Automap()
-    # net.load('./checkpoints/checkpoint_automap_epoch_5.pth')
-    net = model.UNet(3)
-    net.load('./checkpoints/checkpoint_unet_epoch_5.pth')
+    net = model.Automap(0.5)
+    net.load('./checkpoints/checkpoint_automap_epoch_5.pth')
+    # net = model.UNet(3)
+    # net.load('./checkpoints/checkpoint_unet_epoch_5.pth')
     img, label, pre = net.validate(3)
     plt.subplot(131)
     plt.imshow(img, cmap='gray')
@@ -19,6 +19,7 @@ if __name__ == "__main__":
     plt.show()
     img = r
     img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
+    img = 255 - img
     pre = net.predict(img)
     plt.subplot(121)
     plt.imshow(img, cmap='gray')
