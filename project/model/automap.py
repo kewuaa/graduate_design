@@ -24,13 +24,13 @@ config = config.get('automap')
 
 
 class Automap(BaseNet):
-    def __init__(self, img_size: int = 64) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self._dataset = Dataset(
             config.batch_size,
             pre_process=self.pre_process
         )
-        self._img_size = img_size
+        self._img_size = img_size = self._dataset.img_size
         projection_num = int(
             (self._dataset.angle[1] - self._dataset.angle[0]) /
             self._dataset.theta_step
@@ -78,7 +78,6 @@ class Automap(BaseNet):
     def pre_process(self, data: tuple):
         img, label = data
         img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-        img = cv2.resize(img, (self._img_size,) * 2, None, 0, 0, cv2.INTER_LINEAR)
         label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
 
@@ -230,9 +229,6 @@ class Automap(BaseNet):
         pre = self.predict(img, process=False)
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
-        origin_size = (self._dataset.img_size,) * 2
-        img = cv2.resize(img, origin_size, None, 0, 0, cv2.INTER_CUBIC)
-        label = cv2.resize(img, origin_size, None, 0, 0, cv2.INTER_NEAREST)
         return img, label, pre
 
     def predict(self, img, process: bool = True):
@@ -240,8 +236,6 @@ class Automap(BaseNet):
             if type(img) is str:
                 img = cv2.imread(img, cv2.IMREAD_GRAYSCALE)
             img = cv2.normalize(img, None, -0.5, 0.5, cv2.CV_32F)
-            img = cv2.resize(img, (self._img_size,) * 2, None, 0, 0, cv2.INTER_LINEAR)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous().unsqueeze(0)
         pre = self(img)
-        pre = nn.functional.interpolate(pre, (self._dataset.img_size,) * 2, mode='bilinear')
         return pre.squeeze().numpy()

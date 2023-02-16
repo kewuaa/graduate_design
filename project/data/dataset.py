@@ -47,6 +47,7 @@ def init(force=False) -> int:
     circle_size = config_for_data.circle_size
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
+    norm = config_for_data.norm
     assert len(pixel) == 3
     assert len(circle_num) == 2
     assert len(circle_size) == 2
@@ -78,6 +79,7 @@ def init(force=False) -> int:
             img_num,
             *angle,
             theta_step,
+            norm,
             data_path,
         )
         loop = asyncio.get_event_loop()
