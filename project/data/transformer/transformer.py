@@ -23,13 +23,12 @@ class Transformer:
         self._target_path.mkdir(parents=True, exist_ok=True)
 
     def _radon(self, img):
-        if self._norm:
-            img = cv2.normalize(
-                img, None,
-                -0.5, 0.5,
-                cv2.NORM_MINMAX,
-                cv2.CV_32F
-            )
+        img = cv2.normalize(
+            img, None,
+            -0.5, 0.5,
+            cv2.NORM_MINMAX,
+            cv2.CV_32F
+        )
         return cv2.ximgproc.RadonTransform(
             img,
             theta=self._theta_step,
