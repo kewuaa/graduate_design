@@ -192,6 +192,7 @@ class Automap(BaseNet):
                     grad_scaler.scale(loss).backward()
                     grad_scaler.step(optimizer)
                     grad_scaler.update()
+                    global_step += 1
 
                     progress.update(train_task, advance=size)
                     visualizer.plot(step, loss_value, f'epoch {epoch}')
