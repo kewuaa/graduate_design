@@ -295,7 +295,6 @@ class UNet(BaseNet):
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}
                 ''')
-                # scheduler.step(metrics)
                 self.save(f'unet_epoch_{epoch}')
 
     @inference_mode()
