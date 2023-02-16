@@ -31,13 +31,16 @@ class Automap(BaseNet):
             pre_process=self.pre_process
         )
         img_size = self._dataset.img_size
-        self._origin_size = (img_size,) * 2
-        self._img_size = img_size = int(img_size * scale)
-        self._new_size = (img_size,) * 2
         projection_num = int(
             (self._dataset.angle[1] - self._dataset.angle[0]) /
             self._dataset.theta_step
         )
+        self._origin_img_size = (projection_num, img_size)
+        self._origin_label_size = (img_size,) * 2
+        self._img_size = img_size = int(img_size * scale)
+        projection_num = int(projection_num * scale)
+        self._new_label_size = (img_size,) * 2
+        self._new_img_size = (projection_num, img_size)
         self.layer1 = nn.Sequential(
             nn.Flatten(),
             nn.Linear(img_size * projection_num, img_size * projection_num),
@@ -80,8 +83,8 @@ class Automap(BaseNet):
 
     def pre_process(self, data: tuple):
         img, label = data
-        img = cv2.resize(img, self._new_size, None, 0, 0, cv2.INTER_CUBIC)
-        label = cv2.resize(label, self._new_size, None, 0, 0, cv2.INTER_NEAREST)
+        img = cv2.resize(img, self._new_img_size, None, 0, 0, cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._new_label_size, None, 0, 0, cv2.INTER_NEAREST)
         img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
@@ -234,8 +237,8 @@ class Automap(BaseNet):
         pre = self.predict(img, process=False)
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
-        img = cv2.resize(img, self._origin_size, None, 0, 0, cv2.INTER_CUBIC)
-        label = cv2.resize(label, self._origin_size, None, 0, 0, cv2.INTER_NEAREST)
+        img = cv2.resize(img, self._origin_img_size, None, 0, 0, cv2.INTER_CUBIC)
+        label = cv2.resize(label, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
         return img, label, pre
 
     @inference_mode()
@@ -248,4 +251,4 @@ class Automap(BaseNet):
             img = Tensor(np.expand_dims(img, axis=0)).contiguous().unsqueeze(0)
         pre = self(img)
         pre = pre.squeeze().numpy()
-        return cv2.resize(pre, self._origin_size, None, 0, 0, cv2.INTER_NEAREST)
+        return cv2.resize(pre, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
