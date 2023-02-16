@@ -42,7 +42,7 @@ class Transformer:
         img_file = self._source_path / name
         save_path = self._target_path / name
         while not img_file.exists():
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1.5)
         image = None
         while image is None:
             image = await self._loop.run_in_executor(
