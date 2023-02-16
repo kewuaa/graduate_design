@@ -1,6 +1,7 @@
 from functools import partial
 
 import cv2
+import torch
 import numpy as np
 from rich.progress import Progress
 from torch import (
@@ -11,7 +12,6 @@ from torch import (
     nn,
     optim,
 )
-from torch.utils import checkpoint
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
@@ -68,9 +68,9 @@ class Automap(BaseNet):
         return x
 
     def use_checkpoint(self):
-        self.layer1 = checkpoint(self.layer1)
-        self.layer2 = checkpoint(self.layer2)
-        self.layer3 = checkpoint(self.layer3)
+        self.layer1 = torch.utils.checkpoint(self.layer1)
+        self.layer2 = torch.utils.checkpoint(self.layer2)
+        self.layer3 = torch.utils.checkpoint(self.layer3)
 
     def regularize_loss(self) -> Tensor:
         return self._l1_regularizer(self._special_conv2d)
