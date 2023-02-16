@@ -30,9 +30,10 @@ class Automap(BaseNet):
             config.batch_size,
             pre_process=self.pre_process
         )
-        self._img_size = img_size = self._dataset.img_size
+        img_size = self._dataset.img_size
         self._origin_size = (img_size,) * 2
-        self._new_size = (int(img_size * scale),) * 2
+        self._img_size = int(img_size * scale)
+        self._new_size = (self._img_size,) * 2
         projection_num = int(
             (self._dataset.angle[1] - self._dataset.angle[0]) /
             self._dataset.theta_step
