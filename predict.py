@@ -6,6 +6,7 @@ from project import model
 
 if __name__ == "__main__":
     # net = model.Automap()
+    # net.load('./checkpoints/checkpoint_automap_epoch_5.pth')
     net = model.UNet(3)
     net.load('./checkpoints/checkpoint_unet_epoch_5.pth')
     img, label, pre = net.validate(3)
