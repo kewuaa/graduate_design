@@ -127,7 +127,11 @@ class Automap(BaseNet):
             alpha=alpha,
             weight_decay=weight_decay
         )
-        scheduler = optim.lr_scheduler.ExponentialLR(optimizer, 0.99)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            'min',
+            patience=5
+        )
         grad_scaler = cuda.amp.GradScaler(enabled=amp)
         loss_func = nn.MSELoss()
 
@@ -162,6 +166,8 @@ class Automap(BaseNet):
                 visible=False
             )
 
+            division_step = train_set_num // (5 * batch_size)
+            global_step = 0
             self.train()
             for epoch in range(1, epoch_num + 1):
                 progress.reset(train_task)
@@ -186,32 +192,32 @@ class Automap(BaseNet):
                     grad_scaler.scale(loss).backward()
                     grad_scaler.step(optimizer)
                     grad_scaler.update()
-                    if step % 3 == 0:
-                        scheduler.step()
 
                     progress.update(train_task, advance=size)
                     visualizer.plot(step, loss_value, f'epoch {epoch}')
+
+                    if division_step and global_step % division_step == 0:
+                        progress.update(
+                            evaluate_task,
+                            description=f'validation of epoch {epoch}',
+                            visible=True
+                        )
+                        evaluate_loss = self.evaluate(
+                            validate_loader,
+                            device,
+                            amp,
+                            refresh=partial(progress.update, evaluate_task)
+                        )
+                        visualizer.log(f'evaluate loss: {evaluate_loss}')
+                        scheduler.step(evaluate_loss)
+                        progress.update(evaluate_task, visible=False)
                 progress.update(epoch_task, advance=1)
                 average_loss, std_loss = loss_meter.value()
 
-                progress.update(
-                    evaluate_task,
-                    description=f'validation of epoch {epoch}',
-                    visible=True
-                )
-                evaluate_loss = self.evaluate(
-                    validate_loader,
-                    device,
-                    amp,
-                    refresh=partial(progress.update, evaluate_task)
-                )
-                progress.update(evaluate_task, visible=False)
                 visualizer.log(f'''
                     epoch {epoch}:<br>
-                    ----train loss    : {average_loss}<br>
-                    ----evaluate loss : {evaluate_loss}
+                    ----train loss    : {average_loss}
                 ''')
-                # scheduler.step(metrics)
                 self.save(f'automap_epoch_{epoch}')
 
     @inference_mode()
