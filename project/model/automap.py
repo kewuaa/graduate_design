@@ -15,19 +15,16 @@ from torch import (
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
-from .. import config
 from ..data import Dataset
 from ..utils.visdom import Visualizer
 from .base import BaseNet, RegularizeLoss
 
-config = config.get('automap')
-
 
 class Automap(BaseNet):
     def __init__(self, scale: float = 1.) -> None:
-        super().__init__()
+        super().__init__(name='automap')
         self._dataset = Dataset(
-            config.batch_size,
+            self._config.batch_size,
             pre_process=self.pre_process
         )
         img_size = self._dataset.img_size
@@ -95,6 +92,7 @@ class Automap(BaseNet):
         self.to(device)
 
         # load config
+        config = self._config
         epoch_num = config.epoch_num
         batch_size = config.batch_size
         validation_percent = config.validation_percent

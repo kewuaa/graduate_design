@@ -15,24 +15,21 @@ from torch import (
     optim,
     where,
 )
-from torch.utils import checkpoint
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
-from ... import config
 from ...data import Dataset
 from ...utils.visdom import Visualizer
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
-config = config.get('unet')
 
 
 class UNet(BaseNet):
     def __init__(self, n_classes, scale: float = 0.5, bilinear=False):
-        super(UNet, self).__init__()
+        super(UNet, self).__init__(name='unet')
         self.n_classes = n_classes
         self._dataset = Dataset(
-            config.batch_size,
+            self._config.batch_size,
             pre_process=self.pre_process
         )
         self._origin_size = (self._dataset.img_size,) * 2
@@ -144,6 +141,7 @@ class UNet(BaseNet):
         self.to(device)
 
         # load config
+        config = self._config
         epoch_num = config.epoch_num
         batch_size = config.batch_size
         validation_percent = config.validation_percent

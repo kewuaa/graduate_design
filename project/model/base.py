@@ -3,22 +3,29 @@ from pathlib import Path
 import torch
 
 from ..logging import logger
+from .. import config
 
 
 class BaseNet(torch.nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, name: str) -> None:
         super().__init__()
         self._device = 'cpu'
+        self._name = name
+        self._config = config.get(name)
         self._checkpoint_dir = Path('./checkpoints')
         self._checkpoint_dir.mkdir(exist_ok=True)
 
     def load(self, path: Path) -> None:
-        state_dict = torch.load(path)
+        state_dict: dict = torch.load(path)
+        self._config = state_dict.pop('config', None)
         self.load_state_dict(state_dict)
 
-    def save(self, name: str) -> None:
-        path = self._checkpoint_dir / f'checkpoint_{name}.pth'
-        torch.save(self.state_dict(), str(path))
+    def save(self) -> None:
+        path = self._checkpoint_dir / f'checkpoint_{self._name}.pth'
+        state_dict = self.state_dict()
+        if self._config is not None:
+            state_dict['config'] = self._config
+        torch.save(state_dict, str(path))
 
     def start_train(self, device: str = None):
         if device is None:
