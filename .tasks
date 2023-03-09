@@ -1,7 +1,3 @@
 [train-model]
 command=$(+pyenv) train.py
 cwd=<root>
-
-[generate-data]
-command=$(+pyenv) -m project.data
-cwd=<root>
