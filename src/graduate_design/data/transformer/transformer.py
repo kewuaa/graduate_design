@@ -3,6 +3,8 @@ import asyncio
 
 import cv2
 
+from ...utils.cython_lib import transform
+
 
 class Transformer:
     def __init__(
@@ -23,20 +25,21 @@ class Transformer:
         self._target_path.mkdir(parents=True, exist_ok=True)
 
     def _radon(self, img):
-        img = cv2.normalize(
-            img, None,
-            -0.5, 0.5,
-            cv2.NORM_MINMAX,
-            cv2.CV_32F
-        )
-        return cv2.ximgproc.RadonTransform(
-            img,
-            theta=self._theta_step,
-            crop=True,
-            start_angle=self._start_angle,
-            end_angle=self._end_angle,
-            norm=True,
-        )
+        # img = cv2.normalize(
+        #     img, None,
+        #     -0.5, 0.5,
+        #     cv2.NORM_MINMAX,
+        #     cv2.CV_32F
+        # )
+        # return cv2.ximgproc.RadonTransform(
+        #     img,
+        #     theta=self._theta_step,
+        #     crop=True,
+        #     start_angle=self._start_angle,
+        #     end_angle=self._end_angle,
+        #     norm=True,
+        # )
+        return transform.radon(img, self._theta_step)
 
     async def _transform(self, name, refresh=None):
         img_file = self._source_path / name
@@ -51,7 +54,6 @@ class Transformer:
                 str(img_file),
                 cv2.IMREAD_GRAYSCALE
             )
-        # image = np.where(mask, image, 0)
         sinogram = self._radon(image)
         await self._loop.run_in_executor(
             None,

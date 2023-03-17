@@ -18,7 +18,7 @@ from .transformer import Transformer
 data_path = Path('./data')
 
 
-def init() -> int:
+def init(force: bool = False) -> int:
     async def main():
         progress = Progress()
         generate_task = progress.add_task(
@@ -46,13 +46,11 @@ def init() -> int:
     circle_size = config_for_data.circle_size
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
-    assert len(pixel) == 3
-    assert len(circle_num) == 2
-    assert len(circle_size) == 2
-    assert len(angle) == 2
     data_path_exist = data_path.exists()
     while not data_path_exist or config_for_data.reinit:
-        if config_for_data.reinit:
+        if force and data_path_exist:
+            shutil.rmtree(str(data_path))
+        elif config_for_data.reinit:
             if data_path_exist:
                 if input(
                     f'"{data_path.resolve()}" already exists\n'

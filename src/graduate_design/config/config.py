@@ -1,3 +1,4 @@
+from typing import Union
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -11,9 +12,9 @@ except ImportError:
 class DataConfig:
     image_num: int = 10000
     image_size: int = 64
-    pixel: tuple = (0, 128, 10)
-    circle_num: tuple = (1, 3)
-    circle_size: tuple = (6, 16)
+    pixel: Union[tuple, int] = 0
+    circle_num: Union[tuple, int] = 3
+    circle_size: Union[tuple, int] = 10
     theta_step: float = 0.
     angle: tuple = (0, 180)
     reinit: bool = False

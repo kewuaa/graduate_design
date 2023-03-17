@@ -217,7 +217,7 @@ class Automap(BaseNet):
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}
                 ''')
-                self.save(f'automap_epoch_{epoch}')
+                self.save(suffix='epoch' + epoch)
 
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):

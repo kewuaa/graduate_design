@@ -28,6 +28,7 @@ class UNet(BaseNet):
     def __init__(self, n_classes, scale: float = 0.5, bilinear=False):
         super(UNet, self).__init__(name='unet')
         self.n_classes = n_classes
+        self._unique_values = None
         self._dataset = Dataset(
             self._config.batch_size,
             pre_process=self.pre_process
@@ -127,13 +128,18 @@ class UNet(BaseNet):
 
     def load(self, path) -> None:
         state_dict = torch.load(path)
-        self._unique_values = state_dict.pop('unique_values')
+        self._unique_values = state_dict.pop('unique_values', None)
+        self._config = state_dict.pop('config', None)
         self.load_state_dict(state_dict)
 
-    def save(self, name):
+    def save(self, suffix: str = ''):
+        path = self._checkpoint_dir / f'checkpoint_{self._name + suffix}.pth'
         state_dict = self.state_dict()
-        state_dict['unique_values'] = self._unique_values
-        torch.save(state_dict, self._checkpoint_dir / f'checkpoint_{name}.pth')
+        if self._unique_values is not None:
+            state_dict['unique_values'] = self._unique_values
+        if self._config is not None:
+            state_dict['config'] = self._config
+        torch.save(state_dict, path)
 
     def start_train(self, device: str = None):
         super().start_train(device)
@@ -293,7 +299,7 @@ class UNet(BaseNet):
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}
                 ''')
-                self.save(f'unet_epoch_{epoch}')
+                self.save(suffix='epoch' + epoch)
 
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):

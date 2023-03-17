@@ -20,8 +20,8 @@ class BaseNet(torch.nn.Module):
         self._config = state_dict.pop('config', None)
         self.load_state_dict(state_dict)
 
-    def save(self) -> None:
-        path = self._checkpoint_dir / f'checkpoint_{self._name}.pth'
+    def save(self, suffix: str = '') -> None:
+        path = self._checkpoint_dir / f'checkpoint_{self._name + suffix}.pth'
         state_dict = self.state_dict()
         if self._config is not None:
             state_dict['config'] = self._config
