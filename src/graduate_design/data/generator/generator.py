@@ -6,7 +6,7 @@ import asyncio
 
 from PIL import Image, ImageDraw
 
-from ...utils.cython_lib import circle
+from . import circle
 
 
 class Generator:

@@ -5,10 +5,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 include-package-data = true
 
-[tool.setuptools.exclude-package-data]
-graduate_design = [
-    "utils/cython_lib/*.c"
-]
+# [tool.setuptools.exclude-package-data]
+# graduate_design = [
+#     "utils/cython_lib/*.c"
+# ]
 
 [tool.jedi]
 venv = 'ai'

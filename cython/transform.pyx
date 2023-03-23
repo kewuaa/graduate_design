@@ -2,9 +2,13 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: cdivision=True
+# distutils: language=c
+from libc.stdlib cimport rand, srand
+from libc.time cimport time
 import cv2
 import numpy as np
 cimport numpy as cnp
+srand(<unsigned int> time(NULL))
 
 
 cpdef cnp.ndarray[double, ndim=2] radon(
@@ -12,7 +16,7 @@ cpdef cnp.ndarray[double, ndim=2] radon(
         double theta_step
     ):
     cdef:
-        unsigned int i
+        unsigned int i, j
         unsigned int projection_num
         double angle
         int[2] center
@@ -36,7 +40,21 @@ cpdef cnp.ndarray[double, ndim=2] radon(
             borderMode=cv2.BORDER_REPLICATE,
             borderValue=255
         )
-        sinogram[:, i] = img_rotated.astype(np.float64).sum(axis=0)
+        if i % ((rand() % 3 + 1) + 3) == 0:
+        # if i % random.randint(3, 6) == 0:
+            sinogram[:, i] = np.convolve(
+                    img_rotated.astype(np.float64).sum(axis=0),
+                    [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+                    mode='same'
+                    )
+            # for j in range(img_view.shape[0]):
+            #     img_rotated[j, ...] = np.convolve(
+            #         img_rotated[j, ...],
+            #         [1, 1, 1, 1, 1, 1, 1, 1, 1],
+            #         mode='same'
+            #     )
+        else:
+            sinogram[:, i] = img_rotated.astype(np.float64).sum(axis=0)
         i += 1
         angle += theta_step
     return (sinogram - sinogram.min()) / sinogram.ptp() * 255

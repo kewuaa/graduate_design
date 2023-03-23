@@ -1,6 +1,6 @@
 import argparse
 
-import project
+import graduate_design
 
 
 if __name__ == "__main__":

@@ -1,9 +1,19 @@
-from pathlib import Path
+import os
 import asyncio
+from distutils import spawn
+from pathlib import Path
 
 import cv2
 
-from ...utils.cython_lib import transform
+opencv_home = os.environ.get('OPENCV_HOME')
+if opencv_home is None:
+    raise RuntimeError('OpenCV library not find')
+mingw_path = spawn.find_executable('gcc')
+if not mingw_path:
+    raise RuntimeError('stdc lib not find')
+os.add_dll_directory(mingw_path + '/..')
+os.add_dll_directory(opencv_home + '/x64/mingw/bin')
+from . import cpptrans
 
 
 class Transformer:
@@ -23,6 +33,7 @@ class Transformer:
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
+        self._trans = cpptrans.Transform()
 
     def _radon(self, img):
         # img = cv2.normalize(
@@ -46,15 +57,21 @@ class Transformer:
         save_path = self._target_path / name
         while not img_file.exists():
             await asyncio.sleep(1.5)
-        image = None
-        while image is None:
-            image = await self._loop.run_in_executor(
-                None,
-                cv2.imread,
-                str(img_file),
-                cv2.IMREAD_GRAYSCALE
-            )
-        sinogram = self._radon(image)
+        # image = None
+        # while image is None:
+        #     image = await self._loop.run_in_executor(
+        #         None,
+        #         cv2.imread,
+        #         str(img_file),
+        #         cv2.IMREAD_GRAYSCALE
+        #     )
+        # sinogram = self._radon(image)
+        sinogram = await self._loop.run_in_executor(
+            None,
+            self._trans.radon_transform_with_noise,
+            str(img_file),
+            self._theta_step
+        )
         await self._loop.run_in_executor(
             None,
             cv2.imwrite,
