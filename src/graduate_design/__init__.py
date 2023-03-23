@@ -5,7 +5,7 @@ from .data import dataset
 
 
 def generate_data() -> None:
-    dataset.init(force=True)
+    dataset.init()
 
 
 def train(model_name: str, *, device: str = 'cpu'):

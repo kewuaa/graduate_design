@@ -1,6 +1,5 @@
 import asyncio
 import random
-import shutil
 import threading
 from functools import lru_cache, partial
 from pathlib import Path
@@ -18,7 +17,7 @@ from .transformer import Transformer
 data_path = Path('./data')
 
 
-def init(force: bool = False) -> int:
+def init() -> int:
     async def main():
         progress = Progress()
         generate_task = progress.add_task(
@@ -46,23 +45,21 @@ def init(force: bool = False) -> int:
     circle_size = config_for_data.circle_size
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
+    logger.info(f'''
+    config for data:
+        img_size    : {img_size}x{img_size}
+        img_num     : {img_num}
+        pixel       : {pixel}
+        circle_size : {circle_size}
+        circle_num  : {circle_num}
+        angle       : {angle}
+        theta_step  : {theta_step}
+    ''')
+    global data_path
+    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{circle_size}_{circle_num}_{angle}_{theta_step}'
     data_path_exist = data_path.exists()
-    while not data_path_exist or config_for_data.reinit:
-        if force and data_path_exist:
-            shutil.rmtree(str(data_path))
-        elif config_for_data.reinit:
-            if data_path_exist:
-                if input(
-                    f'"{data_path.resolve()}" already exists\n'
-                    'are you sure to remove it?(y/n):'
-                ) == 'y':
-                    shutil.rmtree(str(data_path))
-                else:
-                    logger.info('reinit cancelled')
-                    break
-            logger.info('reinit data...')
-        else:
-            logger.info('not find data in path, initialize it...')
+    if not data_path_exist:
+        logger.info('not find data in path, initialize it...')
         generator = Generator(
             img_num,
             img_size,
@@ -80,7 +77,6 @@ def init(force: bool = False) -> int:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main())
         logger.info('data successfully initialized')
-        break
     return img_num, img_size, angle, theta_step
 
 
@@ -88,9 +84,9 @@ class Dataset(Dataset):
     def __init__(self, batch_size: int, pre_process=None):
         self._refresh = None
         self._data = set()
+        self._length, self.img_size, self.angle, self.theta_step = init()
         self._img_dir = data_path / 'transformed_imgs'
         self._label_dir = data_path / 'imgs'
-        self._length, self.img_size, self.angle, self.theta_step = init()
         self._loop = asyncio.new_event_loop()
         self._batch_size = batch_size
         self._pre_process = pre_process
@@ -160,9 +156,9 @@ class Dataset(Dataset):
         )
 
     def load_one(self, index: int = None):
+        index = index or random.randint(1, self._length)
         if index > self._length:
             raise IndexError('index out of range')
-        index = index or random.randint(1, self._length)
         name = f'{index}.png'
         img = cv2.imread(str(self._img_dir / name), cv2.IMREAD_GRAYSCALE)
         label = cv2.imread(str(self._label_dir / name), cv2.IMREAD_GRAYSCALE)
