@@ -26,6 +26,7 @@ class DataConfig:
 
 @dataclass(order=False, eq=False)
 class ModelConfig:
+    scale: float = 1.
     epoch_num: int = 5
     batch_size: int = 1
     learning_rate: float = 1e-5

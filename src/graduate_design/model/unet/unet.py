@@ -25,8 +25,9 @@ from .unet_parts import DoubleConv, Down, OutConv, Up
 
 
 class UNet(BaseNet):
-    def __init__(self, n_classes, scale: float = 0.5, bilinear=False):
+    def __init__(self, n_classes, bilinear=False):
         super(UNet, self).__init__(name='unet')
+        scale = self._config.scale
         self.n_classes = n_classes
         self._unique_values = None
         self._dataset = Dataset(

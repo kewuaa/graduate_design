@@ -8,12 +8,12 @@ def generate_data() -> None:
     dataset.init(force=True)
 
 
-def train(automap: dict = None, unet: dict = None, *, device: str = 'cpu'):
+def train(model_name: str, *, device: str = 'cpu'):
     net: model.base.BaseNet = None
-    if automap is not None:
-        net = model.Automap(**automap)
-    elif unet is not None:
-        net = model.UNet(**unet)
+    if model_name == 'automap':
+        net = model.Automap()
+    elif model_name == 'unet':
+        net = model.UNet()
     else:
         raise
     try:

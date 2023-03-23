@@ -21,8 +21,9 @@ from .base import BaseNet, RegularizeLoss
 
 
 class Automap(BaseNet):
-    def __init__(self, scale: float = 1.) -> None:
+    def __init__(self) -> None:
         super().__init__(name='automap')
+        scale = self._config.scale
         self._dataset = Dataset(
             self._config.batch_size,
             pre_process=self.pre_process
