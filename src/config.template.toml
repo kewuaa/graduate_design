@@ -1,0 +1,32 @@
+# rename this file to config.toml to config for the program
+# down here are the available item
+
+
+[data] # config for data part
+image_num = 100
+image_size = 64
+pixel = [0, 128, 10]
+circle_num = [1, 3]
+circle_size = [6, 16]
+theta_step = 1.5
+angle = [0, 180]
+reinit = false
+
+[automap] # config for automap
+scale = 1.0
+epoch_num = 5
+batch_size = 50
+learning_rate = 2e-5
+weight_decay = 0.0
+amp = true
+alpha = 0.9
+
+[unet] # config for unet
+scale = 0.5
+epoch_num = 5
+batch_size = 50
+learning_rate = 1e-5
+weight_decay = 1e-8
+amp = true
+momentum = 1.0
+gradient_clipping = 1.0
