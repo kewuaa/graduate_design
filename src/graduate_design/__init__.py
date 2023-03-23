@@ -5,15 +5,21 @@ from matplotlib import pyplot as plt
 from . import model
 from .data import dataset
 generate_data = dataset.init
+net = None
 
 
-def train(model_name: str, *, device: str = 'cpu'):
+def load_model(model_name: str):
+    global net
     if model_name == 'automap':
         net = model.Automap()
     elif model_name == 'unet':
         net = model.UNet()
     else:
         raise
+
+
+
+def train(model_name: str, *, device: str = 'cpu'):
     try:
         net.start_train(device)
     except torch.cuda.OutOfMemoryError:
@@ -23,12 +29,6 @@ def train(model_name: str, *, device: str = 'cpu'):
 
 
 def validate(model_name: str):
-    if model_name == 'automap':
-        net = model.Automap()
-    elif model_name == 'unet':
-        net = model.UNet()
-    else:
-        raise
     net.auto_load()
     img, label, pre = net.validate()
     plt.subplot(131)
@@ -44,12 +44,6 @@ def validate(model_name: str):
 
 
 def predict(model_name: str, img_path: str):
-    if model_name == 'automap':
-        net = model.Automap()
-    elif model_name == 'unet':
-        net = model.UNet()
-    else:
-        raise
     net.auto_load()
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     pre = net.predict(img)
