@@ -19,7 +19,7 @@ def load_model(model_name: str):
 
 
 
-def train(model_name: str, *, device: str = 'cpu'):
+def train(*, device: str = 'cpu'):
     try:
         net.start_train(device)
     except torch.cuda.OutOfMemoryError:
@@ -28,7 +28,7 @@ def train(model_name: str, *, device: str = 'cpu'):
         net.start_train(device)
 
 
-def validate(model_name: str):
+def validate():
     net.auto_load()
     img, label, pre = net.validate()
     plt.subplot(131)
@@ -43,7 +43,7 @@ def validate(model_name: str):
     plt.show()
 
 
-def predict(model_name: str, img_path: str):
+def predict(img_path: str):
     net.auto_load()
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     pre = net.predict(img)
