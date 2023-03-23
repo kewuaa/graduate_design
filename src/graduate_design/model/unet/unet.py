@@ -18,7 +18,6 @@ from torch import (
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
-from ...data import Dataset
 from ...utils.visdom import Visualizer
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
@@ -30,10 +29,6 @@ class UNet(BaseNet):
         scale = self._config.scale
         self.n_classes = self._config.n_classes
         self._unique_values = None
-        self._dataset = Dataset(
-            self._config.batch_size,
-            pre_process=self.pre_process
-        )
         self._origin_size = (self._dataset.img_size,) * 2
         self._new_size = (int(self._dataset.img_size * scale),) * 2
 
@@ -47,7 +42,7 @@ class UNet(BaseNet):
         self.up2 = (Up(512, 256 // factor, bilinear))
         self.up3 = (Up(256, 128 // factor, bilinear))
         self.up4 = (Up(128, 64, bilinear))
-        self.outc = (OutConv(64, n_classes))
+        self.outc = (OutConv(64, self.n_classes))
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -143,7 +138,7 @@ class UNet(BaseNet):
         torch.save(state_dict, path)
 
     def start_train(self, device: str = None):
-        super().start_train(device)
+        self.set_device(device)
         device = self._device
         self.to(device)
 
@@ -300,7 +295,7 @@ class UNet(BaseNet):
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}
                 ''')
-                self.save(suffix='epoch' + epoch)
+                self.save(suffix=f'epoch{epoch}')
 
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):

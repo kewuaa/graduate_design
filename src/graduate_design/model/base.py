@@ -2,6 +2,7 @@ from pathlib import Path
 
 import torch
 
+from ..data import Dataset
 from ..logging import logger
 from .. import config
 
@@ -12,8 +13,28 @@ class BaseNet(torch.nn.Module):
         self._device = 'cpu'
         self._name = name
         self._config = config.get(name)
-        self._checkpoint_dir = Path('./checkpoints')
+        self._dataset = Dataset(
+            self._config.batch_size,
+            pre_process=self.pre_process
+        )
+        self._checkpoint_dir = self._dataset._root_dir / 'checkpoints' / name
         self._checkpoint_dir.mkdir(exist_ok=True)
+
+    def print_config(self) -> None:
+        info = '\n\t\t'.join(
+            f"{field}: {getattr(self._config, field)}"
+            for field in self._config.__dataclass_fields__
+        )
+        logger.info(f'''
+        train config:
+                {info}
+        ''')
+
+    def auto_load(self, index: int = None):
+        if index is None:
+            index = self._config.epoch_num
+        pth_file_path = self._checkpoint_dir / f'checkpoint_epoch{index}.pth'
+        self.load(str(pth_file_path))
 
     def load(self, path: Path) -> None:
         state_dict: dict = torch.load(path)
@@ -21,13 +42,13 @@ class BaseNet(torch.nn.Module):
         self.load_state_dict(state_dict)
 
     def save(self, suffix: str = '') -> None:
-        path = self._checkpoint_dir / f'checkpoint_{self._name + suffix}.pth'
+        path = self._checkpoint_dir / f'checkpoint_{suffix}.pth'
         state_dict = self.state_dict()
         if self._config is not None:
             state_dict['config'] = self._config
         torch.save(state_dict, str(path))
 
-    def start_train(self, device: str = None):
+    def set_device(self, device: str):
         if device is None:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
         elif device == 'cuda':
@@ -35,6 +56,12 @@ class BaseNet(torch.nn.Module):
                 logger.warn('cuda is not available in your computer')
                 device = 'cpu'
         self._device = torch.device(device)
+
+    def start_train(self, device: str = None):
+        pass
+
+    def pre_process(self, data: tuple):
+        return data
 
     def evaluate(self, dataloader, device, amp, refresh):
         pass

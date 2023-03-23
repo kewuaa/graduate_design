@@ -57,8 +57,7 @@ def init() -> int:
     ''')
     global data_path
     data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{circle_size}_{circle_num}_{angle}_{theta_step}'
-    data_path_exist = data_path.exists()
-    if not data_path_exist:
+    if not data_path.exists():
         logger.info('not find data in path, initialize it...')
         generator = Generator(
             img_num,
@@ -85,10 +84,12 @@ class Dataset(Dataset):
         self._refresh = None
         self._data = set()
         self._length, self.img_size, self.angle, self.theta_step = init()
+        self._root_dir = data_path
         self._img_dir = data_path / 'transformed_imgs'
         self._label_dir = data_path / 'imgs'
         self._loop = asyncio.new_event_loop()
         self._batch_size = batch_size
+        assert callable(pre_process)
         self._pre_process = pre_process
 
     def add_refresh(self, refresh) -> None:
@@ -146,8 +147,7 @@ class Dataset(Dataset):
             str(self._label_dir / name),
             cv2.IMREAD_GRAYSCALE
         )
-        if self._pre_process is not None:
-            img, label = self._pre_process((img, label))
+        img, label = self._pre_process((img, label))
         if callable(self._refresh):
             self._refresh()
         return (

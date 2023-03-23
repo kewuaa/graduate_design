@@ -24,10 +24,6 @@ class Automap(BaseNet):
     def __init__(self) -> None:
         super().__init__(name='automap')
         scale = self._config.scale
-        self._dataset = Dataset(
-            self._config.batch_size,
-            pre_process=self.pre_process
-        )
         img_size = self._dataset.img_size
         projection_num = int(
             (self._dataset.angle[1] - self._dataset.angle[0]) /
@@ -88,7 +84,7 @@ class Automap(BaseNet):
         return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
 
     def start_train(self, device: str = None) -> None:
-        super().start_train(device)
+        self.set_device(device)
         device = self._device
         self.to(device)
 
@@ -101,6 +97,7 @@ class Automap(BaseNet):
         weight_decay = config.weight_decay
         alpha = config.alpha
         amp = config.amp and device.type == 'cuda'
+        self.print_config()
 
         # 1. Create dataset
         dataset = self._dataset
@@ -218,7 +215,7 @@ class Automap(BaseNet):
                     epoch {epoch}:<br>
                     ----train loss    : {average_loss}
                 ''')
-                self.save(suffix='epoch' + epoch)
+                self.save(suffix=f'epoch{epoch}')
 
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):

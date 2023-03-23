@@ -1,12 +1,11 @@
 .pytest_cache/
-checkpoints/
 real_data/
-.venv/
-./data/
-config.toml
+.venv
+/data
+/config.toml
 release/
-**/__pycache__/
-**/build/
+__pycache__/
+build/
 *.png
 *.pyd
 *.c
