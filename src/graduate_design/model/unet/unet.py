@@ -25,10 +25,10 @@ from .unet_parts import DoubleConv, Down, OutConv, Up
 
 
 class UNet(BaseNet):
-    def __init__(self, n_classes, bilinear=False):
+    def __init__(self, bilinear=False):
         super(UNet, self).__init__(name='unet')
         scale = self._config.scale
-        self.n_classes = n_classes
+        self.n_classes = self._config.n_classes
         self._unique_values = None
         self._dataset = Dataset(
             self._config.batch_size,
