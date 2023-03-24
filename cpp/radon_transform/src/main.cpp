@@ -33,7 +33,7 @@ class Transformer
         std::uniform_int_distribution<unsigned int> u;
 
     public:
-        Transformer(): u(3, 6) {}
+        Transformer(): u(3, 9) {}
 
         uint8_array radon_transform_with_noise(
             const char* img_path,
@@ -91,8 +91,12 @@ class Transformer
             double _t;
             cv::Mat _rotated_src;
             cv::Mat _radon(_row_num, _col_num, _out_mat_type);
-            cv::Mat _kernel = (cv::Mat_<float>(10, 1) << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
-            // cv::Mat _kernel = cv::Mat::ones(9, 1, CV_32F);
+            float _kernel_data[25];
+            for (unsigned int i = 0;i < 25; i++) {
+                _kernel_data[i] = 0.1;
+            }
+            cv::Mat _kernel(25, 1, CV_32F, _kernel_data);
+            // cv::Mat _kernel = (cv::Mat_<float>(10, 1) << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1);
 
             for (int _col = 0; _col < _col_num; _col++) {
                 // rotate the source by _t
@@ -105,15 +109,13 @@ class Transformer
                 // add noise
                 if (_col % u(e) == 0) {
                     cv::filter2D(_col_mat, _col_mat, -1, _kernel);
-                    // for (unsigned int i = 0; i < _row_num; i++) {
-                    //     cv::filter2D(_rotated_src.col(_col), _rotated_src.col(_col), -1, _kernel);
-                    // }
                 }
             }
 
             if (norm) {
                 normalize(_radon, _radon, 0, 255, cv::NORM_MINMAX, CV_8UC1);
             }
+            cv::GaussianBlur(_radon, _radon, {5, 5}, 1.5);
 
             return uint8_array({_radon.rows, _radon.cols, 1}, _radon.data);
         }
