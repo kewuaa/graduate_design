@@ -15,7 +15,7 @@ class Generator:
         img_num: int,
         img_size: int,
         pixel: Union[list, int],
-        circle_num: Union[list],
+        circle_num: Union[list, int],
         circle_size: Union[list, int],
         data_path: Path,
     ) -> None:
