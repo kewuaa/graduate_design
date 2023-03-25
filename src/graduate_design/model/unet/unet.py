@@ -95,7 +95,6 @@ class UNet(BaseNet):
         sets_sum = where(sets_sum == 0, inter, sets_sum)
 
         dice = (inter + epsilon) / (sets_sum + epsilon)
-        print(input, target, sum_dim, dice, sep='\n')
         return dice.mean()
 
     def __multiclass_dice_coeff(
@@ -130,7 +129,7 @@ class UNet(BaseNet):
         self.load_state_dict(state_dict)
 
     def save(self, suffix: str = ''):
-        path = self._checkpoint_dir / f'checkpoint_{self._name + suffix}.pth'
+        path = self._checkpoint_dir / f'checkpoint_{suffix}.pth'
         state_dict = self.state_dict()
         if self._unique_values is not None:
             state_dict['unique_values'] = self._unique_values
