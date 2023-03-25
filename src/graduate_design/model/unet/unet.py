@@ -73,7 +73,7 @@ class UNet(BaseNet):
         img, label = data
         img = cv2.resize(img, self._new_size, None, 0., 0., cv2.INTER_CUBIC)
         label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
-        if not hasattr(self, '_unique_values'):
+        if self._unique_values is None:
             self._unique_values = np.unique(label)
         for i, v in enumerate(self._unique_values):
             label[label == v] = i
@@ -95,6 +95,7 @@ class UNet(BaseNet):
         sets_sum = where(sets_sum == 0, inter, sets_sum)
 
         dice = (inter + epsilon) / (sets_sum + epsilon)
+        print(input, target, sum_dim, dice, sep='\n')
         return dice.mean()
 
     def __multiclass_dice_coeff(
@@ -140,7 +141,6 @@ class UNet(BaseNet):
     def start_train(self, device: str = None):
         self.set_device(device)
         device = self._device
-        self.to(device)
 
         # load config
         config = self._config

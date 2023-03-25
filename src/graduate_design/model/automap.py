@@ -15,7 +15,6 @@ from torch import (
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
-from ..data import Dataset
 from ..utils.visdom import Visualizer
 from .base import BaseNet, RegularizeLoss
 
@@ -86,7 +85,6 @@ class Automap(BaseNet):
     def start_train(self, device: str = None) -> None:
         self.set_device(device)
         device = self._device
-        self.to(device)
 
         # load config
         config = self._config

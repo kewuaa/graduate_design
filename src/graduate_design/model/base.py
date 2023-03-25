@@ -18,7 +18,7 @@ class BaseNet(torch.nn.Module):
             pre_process=self.pre_process
         )
         self._checkpoint_dir = self._dataset._root_dir / 'checkpoints' / name
-        self._checkpoint_dir.mkdir(exist_ok=True)
+        self._checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
     def print_config(self) -> None:
         info = '\n\t\t'.join(
@@ -56,12 +56,16 @@ class BaseNet(torch.nn.Module):
                 logger.warn('cuda is not available in your computer')
                 device = 'cpu'
         self._device = torch.device(device)
+        self.to(device)
 
     def start_train(self, device: str = None):
         pass
 
     def pre_process(self, data: tuple):
         return data
+
+    def validate(self, index: int = None):
+        pass
 
     def evaluate(self, dataloader, device, amp, refresh):
         pass
