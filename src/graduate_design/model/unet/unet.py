@@ -27,8 +27,14 @@ class UNet(BaseNet):
     def __init__(self, bilinear=False):
         super(UNet, self).__init__(name='unet')
         scale = self._config.scale
-        self.n_classes = self._config.n_classes
-        self._unique_values = None
+        label = cv2.imread(
+            str(self._dataset._label_dir / '1.png'),
+            cv2.IMREAD_GRAYSCALE
+        )
+        self._unique_values = np.unique(label)
+        self.n_classes = self._config.n_classes or self._unique_values.size - 1
+        if self.n_classes < 1:
+            raise RuntimeError('get wrong n_classes')
         self._origin_size = (self._dataset.img_size,) * 2
         self._new_size = (int(self._dataset.img_size * scale),) * 2
 
@@ -73,8 +79,6 @@ class UNet(BaseNet):
         img, label = data
         img = cv2.resize(img, self._new_size, None, 0., 0., cv2.INTER_CUBIC)
         label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
-        if self._unique_values is None:
-            self._unique_values = np.unique(label)
         for i, v in enumerate(self._unique_values):
             label[label == v] = i
         img = (img / 255).astype(np.float32)

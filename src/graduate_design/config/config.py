@@ -42,7 +42,7 @@ class AutomapConfig(ModelConfig):
 
 @dataclass(order=False, eq=False)
 class UnetConfig(ModelConfig):
-    n_classes: int = 3
+    n_classes: int = 0
     momentum: float = 1.
     gradient_clipping: float = 1.
 

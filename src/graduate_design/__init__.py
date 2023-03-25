@@ -28,8 +28,8 @@ def train(*, device: str = 'cpu'):
         net.start_train(device)
 
 
-def validate():
-    net.auto_load()
+def validate(checkpoint_index: int = None):
+    net.auto_load(checkpoint_index)
     img, label, pre = net.validate()
     plt.subplot(131)
     plt.title('sinogram')
