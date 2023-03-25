@@ -43,8 +43,8 @@ def validate(checkpoint_index: int = None):
     plt.show()
 
 
-def predict(img_path: str):
-    net.auto_load()
+def predict(img_path: str, checkpoint_index: int = None):
+    net.auto_load(checkpoint_index)
     img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
     pre = net.predict(img)
     plt.subplot(121)
