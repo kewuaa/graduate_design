@@ -12,8 +12,4 @@
 # plt.imshow(img, cmap='gray')
 # plt.show()
 from src import graduate_design
-from src.graduate_design.data.dataset import Dataset
-dataset = Dataset(batch_size=10)
-with dataset:
-    print(dataset.load_one())
-# graduate_design.generate_data()
+graduate_design.generate_data()
