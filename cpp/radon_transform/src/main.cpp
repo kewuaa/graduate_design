@@ -41,7 +41,8 @@ class Transformer
             double start_angle=0.,
             double end_angle=180.,
             bool crop=true,
-            bool norm=true
+            bool norm=true,
+            bool add_noise=true
         )
         {
             PyGilSwitcher pygilswitch;
@@ -107,7 +108,7 @@ class Transformer
                 // make projection
                 cv::reduce(_rotated_src, _col_mat, 1, cv::REDUCE_SUM, _out_mat_type);
                 // add noise
-                if (_col % u(e) == 0) {
+                if (add_noise && _col % u(e) == 0) {
                     cv::filter2D(_col_mat, _col_mat, -1, _kernel);
                 }
             }
@@ -115,7 +116,9 @@ class Transformer
             if (norm) {
                 normalize(_radon, _radon, 0, 255, cv::NORM_MINMAX, CV_8UC1);
             }
-            cv::GaussianBlur(_radon, _radon, {5, 5}, 1.5);
+            if (add_noise) {
+                cv::GaussianBlur(_radon, _radon, {5, 5}, 1.5);
+            }
 
             return uint8_array({_radon.rows, _radon.cols, 1}, _radon.data);
         }
@@ -135,6 +138,7 @@ PYBIND11_MODULE(cpptrans, m)
             py::arg("start_angle")=0.,
             py::arg("end_angle")=180.,
             py::arg("crop")=true,
-            py::arg("norm")=true
+            py::arg("norm")=true,
+            py::arg("add_noise")=true
         );
 }

@@ -2,6 +2,7 @@ import os
 import asyncio
 from distutils import spawn
 from pathlib import Path
+from functools import partial
 
 import cv2
 
@@ -24,33 +25,37 @@ class Transformer:
         end_angle: int,
         theta_step: float,
         data_path: Path,
+        add_noise: bool,
     ) -> None:
         self._img_num = img_num
-        self._theta_step = theta_step
-        self._start_angle = start_angle
-        self._end_angle = end_angle
         self._loop = asyncio.get_event_loop()
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
         self._trans = cpptrans.Transform()
+        self._radon = partial(
+            self._trans.radon_transform_with_noise,
+            theta=theta_step,
+            start_angle=start_angle,
+            end_angle=end_angle,
+            add_noise=add_noise
+        )
 
-    def _radon(self, img):
-        # img = cv2.normalize(
-        #     img, None,
-        #     -0.5, 0.5,
-        #     cv2.NORM_MINMAX,
-        #     cv2.CV_32F
-        # )
-        # return cv2.ximgproc.RadonTransform(
-        #     img,
-        #     theta=self._theta_step,
-        #     crop=True,
-        #     start_angle=self._start_angle,
-        #     end_angle=self._end_angle,
-        #     norm=True,
-        # )
-        return transform.radon(img, self._theta_step)
+    # def _radon(self, img):
+    #     img = cv2.normalize(
+    #         img, None,
+    #         -0.5, 0.5,
+    #         cv2.NORM_MINMAX,
+    #         cv2.CV_32F
+    #     )
+    #     return cv2.ximgproc.RadonTransform(
+    #         img,
+    #         theta=self._theta_step,
+    #         crop=True,
+    #         start_angle=self._start_angle,
+    #         end_angle=self._end_angle,
+    #         norm=True,
+    #     )
 
     async def _transform(self, name, refresh=None):
         img_file = self._source_path / name
@@ -68,9 +73,8 @@ class Transformer:
         # sinogram = self._radon(image)
         sinogram = await self._loop.run_in_executor(
             None,
-            self._trans.radon_transform_with_noise,
+            self._radon,
             str(img_file),
-            self._theta_step
         )
         await self._loop.run_in_executor(
             None,

@@ -17,6 +17,7 @@ class DataConfig:
     circle_size: Union[tuple, int] = 10
     theta_step: float = 0.
     angle: tuple = (0, 180)
+    noise: bool = True
 
     def __post_init__(self):
         if not self.theta_step:

@@ -45,6 +45,7 @@ def init() -> int:
     circle_size = config_for_data.circle_size
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
+    add_noise = config_for_data.noise
     logger.info(f'''
     config for data:
         img_size    : {img_size}x{img_size}
@@ -54,9 +55,10 @@ def init() -> int:
         circle_num  : {circle_num}
         angle       : {angle}
         theta_step  : {theta_step}
+        noise       : {add_noise}
     ''')
     global data_path
-    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{circle_size}_{circle_num}_{angle}_{theta_step}'
+    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{circle_size}_{circle_num}_{angle}_{theta_step}_{"with" if add_noise else "without"}_noise'
     if not data_path.exists():
         logger.info('not find data in path, initialize it...')
         generator = Generator(
@@ -72,6 +74,7 @@ def init() -> int:
             *angle,
             theta_step,
             data_path,
+            add_noise,
         )
         loop = asyncio.get_event_loop()
         loop.run_until_complete(main())
