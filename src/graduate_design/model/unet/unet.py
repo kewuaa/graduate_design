@@ -75,36 +75,29 @@ class UNet(BaseNet):
         label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
         for i, v in enumerate(self._unique_values):
             label[label == v] = i + 1
+        if self.n_classes > 1:
+            label = np.transpose(np.eye(self.n_classes)[label], [2, 0, 1])
         img = (img / 255).astype(np.float32)
         return np.expand_dims(img, axis=0), label.astype(np.int64)
 
-    def __dice_coeff(
+    def _dice_coeff(
         self,
         input: Tensor,
         target: Tensor,
         reduce_batch_first: bool = False,
         epsilon: float = 1e-6
     ):
+        assert input.shape == target.shape
+        if input.dim() > 3:
+            input = nn.functional.softmax(input, dim=1).flatten(0, 1)
+            target = target.flatten(0, 1)
+        else:
+            input = sigmoid(input)
         sum_dim = (-1, -2, -3) if reduce_batch_first else (-1, -2)
         inter = 2 * (input * target).sum(dim=sum_dim)
         sets_sum = (input + target).sum(dim=sum_dim)
         dice = (inter + epsilon) / (sets_sum + epsilon)
         return dice.mean()
-
-    def __multiclass_dice_coeff(
-        self,
-        input: Tensor,
-        target: Tensor,
-        reduce_batch_first: bool = False,
-        epsilon: float = 1e-6
-    ):
-        # Average of Dice coefficient for all classes
-        return self.__dice_coeff(
-            input.flatten(0, 1),
-            target.flatten(0, 1),
-            reduce_batch_first,
-            epsilon
-        )
 
     def _dice_loss(
         self,
@@ -113,8 +106,7 @@ class UNet(BaseNet):
         multiclass: bool = False
     ):
         # Dice loss (objective to minimize) between 0 and 1
-        fn = self.__multiclass_dice_coeff if multiclass else self.__dice_coeff
-        return 1 - fn(input, target, reduce_batch_first=True)
+        return 1 - self._dice_coeff(input, target, reduce_batch_first=True)
 
     def load(self, path) -> None:
         state_dict = torch.load(path)
@@ -233,26 +225,9 @@ class UNet(BaseNet):
                     label = label.to(device=device)
 
                     with autocast(device.type, enabled=amp):
-                        pre = self(image)
-                        if self.n_classes == 1:
-                            pre = pre.squeeze(1)
-                            loss = loss_func(pre, label)
-                            loss += self._dice_loss(
-                                sigmoid(pre),
-                                label.float(),
-                                multiclass=False,
-                            )
-                        else:
-                            label = nn.functional.one_hot(
-                                label.long(),
-                                self.n_classes
-                            ).permute(0, 3, 1, 2).float()
-                            loss = loss_func(pre, label)
-                            loss += self._dice_loss(
-                                nn.functional.softmax(pre, dim=1).float(),
-                                label,
-                                multiclass=True,
-                            )
+                        pre = self(image).squeeze()
+                        loss = loss_func(pre, label)
+                        loss += self._dice_loss(pre, label)
                     loss_value = loss.item()
                     loss_meter.add(loss_value)
                     optimizer.zero_grad(set_to_none=True)
@@ -313,7 +288,7 @@ class UNet(BaseNet):
                 if self.n_classes == 1:
                     pre = (sigmoid(pre.squeeze(1)) > 0.5).float()
                     # compute the Dice score
-                    dice_score += self.__dice_coeff(
+                    dice_score += self._dice_coeff(
                         pre,
                         label,
                     )
