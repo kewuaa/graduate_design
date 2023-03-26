@@ -74,7 +74,7 @@ class UNet(BaseNet):
         img = cv2.resize(img, self._new_size, None, 0., 0., cv2.INTER_CUBIC)
         label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
         for i, v in enumerate(self._unique_values):
-            label[label == v] = i
+            label[label == v] = i + 1
         img = (img / 255).astype(np.float32)
         return np.expand_dims(img, axis=0), label.astype(np.int64)
 
@@ -85,13 +85,9 @@ class UNet(BaseNet):
         reduce_batch_first: bool = False,
         epsilon: float = 1e-6
     ):
-        sum_dim = (-1, -2) \
-            if input.dim() == 2 or not reduce_batch_first else (-1, -2, -3)
-
+        sum_dim = (-1, -2, -3) if reduce_batch_first else (-1, -2)
         inter = 2 * (input * target).sum(dim=sum_dim)
-        sets_sum = input.sum(dim=sum_dim) + target.sum(dim=sum_dim)
-        sets_sum = where(sets_sum == 0, inter, sets_sum)
-
+        sets_sum = (input + target).sum(dim=sum_dim)
         dice = (inter + epsilon) / (sets_sum + epsilon)
         return dice.mean()
 
@@ -240,20 +236,21 @@ class UNet(BaseNet):
                         pre = self(image)
                         if self.n_classes == 1:
                             pre = pre.squeeze(1)
-                            label = label.float()
                             loss = loss_func(pre, label)
                             loss += self._dice_loss(
                                 sigmoid(pre),
-                                label,
+                                label.float(),
                                 multiclass=False,
                             )
                         else:
-                            label = label.long()
+                            label = nn.functional.one_hot(
+                                label.long(),
+                                self.n_classes
+                            ).permute(0, 3, 1, 2).float()
                             loss = loss_func(pre, label)
                             loss += self._dice_loss(
                                 nn.functional.softmax(pre, dim=1).float(),
-                                nn.functional.one_hot(label, self.n_classes) \
-                                    .permute(0, 3, 1, 2).float(),
+                                label,
                                 multiclass=True,
                             )
                     loss_value = loss.item()
@@ -314,18 +311,16 @@ class UNet(BaseNet):
                 pre = self(image)
 
                 if self.n_classes == 1:
-                    pre = (sigmoid(pre) > 0.5).float()
+                    pre = (sigmoid(pre.squeeze(1)) > 0.5).float()
                     # compute the Dice score
                     dice_score += self.__dice_coeff(
                         pre,
                         label,
-                        reduce_batch_first=False
                     )
                 else:
-                    label = label.long()
                     # convert to one-hot format
                     label = nn.functional.one_hot(
-                        label,
+                        label.long(),
                         self.n_classes
                     ).permute(0, 3, 1, 2).float()
                     pre = nn.functional.one_hot(
@@ -336,7 +331,6 @@ class UNet(BaseNet):
                     dice_score += self.__multiclass_dice_coeff(
                         pre[:, 1:],
                         label[:, 1:],
-                        reduce_batch_first=False
                     )
             refresh(advance=image.size(0))
         self.train()
@@ -359,13 +353,14 @@ class UNet(BaseNet):
             img = (cv2.resize(img, self._new_size) / 255).astype(np.float32)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous()
             img = img.unsqueeze(0)
+        img.to(self._device)
         pre = self(img)
         pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
             pre = sigmoid(pre) > 0.5
-        pre = pre.squeeze().numpy()
+        pre = pre.cpu().squeeze().numpy()
         for i, v in enumerate(self._unique_values):
-            pre[pre == i] = v
+            pre[pre == i + 1] = v
         return pre

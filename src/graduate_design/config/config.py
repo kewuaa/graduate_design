@@ -51,7 +51,7 @@ class UnetConfig(ModelConfig):
 
 
 def init():
-    global config
+    global __config
     if config_file.exists():
         with open(config_file) as f:
             config = toml.load(f)
@@ -59,14 +59,15 @@ def init():
     automap = AutomapConfig(**config.get('automap', {}))
     unet = UnetConfig(**config.get('unet', {}))
     if not (unet.n_classes and unet.unique_values):
-        pixel = data.pixel
-        if type(pixel) is int:
+        if type(data.pixel) is int:
             unet.n_classes = 1
-            unet.unique_values = [pixel]
+            unet.unique_values = [data.pixel]
         else:
-            unet.n_classes = len(pixel)
-            unet.n_classes = list(range(*pixel))
-    config = {
+            unet.unique_values = list(range(*data.pixel))
+            unet.n_classes = len(unet.unique_values) + 1
+            if unet.n_classes == 2:
+                data.pixel = unet.unique_values[0]
+    __config = {
         'data': data,
         'automap': automap,
         'unet': unet,

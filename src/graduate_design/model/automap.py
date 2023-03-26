@@ -250,6 +250,7 @@ class Automap(BaseNet):
             img = cv2.resize(img, self._new_img_size, None, 0, 0, cv2.INTER_CUBIC)
             img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, cv2.CV_32F)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous().unsqueeze(0)
+        img.to(self._device)
         pre = self(img)
-        pre = pre.squeeze().numpy()
+        pre = pre.cpu().squeeze().numpy()
         return cv2.resize(pre, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
