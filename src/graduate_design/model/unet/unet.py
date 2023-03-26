@@ -27,14 +27,8 @@ class UNet(BaseNet):
     def __init__(self, bilinear=False):
         super(UNet, self).__init__(name='unet')
         scale = self._config.scale
-        label = cv2.imread(
-            str(self._dataset._label_dir / '1.png'),
-            cv2.IMREAD_GRAYSCALE
-        )
-        self._unique_values = np.unique(label)
-        self.n_classes = self._config.n_classes or self._unique_values.size - 1
-        if self.n_classes < 1:
-            raise RuntimeError('get wrong n_classes')
+        self.n_classes = self._config.n_classes
+        self._unique_values = self._config.unique_values
         self._origin_size = (self._dataset.img_size,) * 2
         self._new_size = (int(self._dataset.img_size * scale),) * 2
 
@@ -155,6 +149,7 @@ class UNet(BaseNet):
         momentum = config.momentum
         gradient_clipping = config.gradient_clipping
         amp = config.amp and device.type == 'cuda'
+        self.print_config()
 
         # 1. Create dataset
         dataset = self._dataset

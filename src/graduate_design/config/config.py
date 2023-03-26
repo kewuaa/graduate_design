@@ -6,6 +6,7 @@ try:
     import rtoml as toml
 except ImportError:
     import tomli as toml
+config_file = Path('./config.toml')
 
 
 @dataclass(order=False, eq=False)
@@ -43,25 +44,28 @@ class AutomapConfig(ModelConfig):
 @dataclass(order=False, eq=False)
 class UnetConfig(ModelConfig):
     n_classes: int = 0
+    unique_values: list = []
     momentum: float = 1.
     gradient_clipping: float = 1.
 
 
-__config_file = Path('./config.toml')
-__config = {
-    'data': {},
-    'automap': {},
-    'unet': {},
-}
-if __config_file.exists():
-    with open(__config_file) as f:
-        __config = toml.load(f)
-__config = {
-    'data': DataConfig(**__config['data']),
-    'automap': AutomapConfig(**__config['automap']),
-    'unet': UnetConfig(**__config['unet'])
-}
+class Config:
+    config = {}
+    if config_file.exists():
+        with open(config_file) as __f:
+            config = toml.load(__f)
+    data = DataConfig(**config.get('data', {})),
+    automap = AutomapConfig(**config.get('automap', {})),
+    unet = UnetConfig(**config.get('unet', {})),
+    if not (unet.n_classes and unet.unique_values):
+        __pixel = data.pixel
+        if type(__pixel) is int:
+            unet.n_classes = 1
+            unet.unique_values = [__pixel]
+        else:
+            unet.n_classes = len(__pixel)
+            unet.n_classes = list(range(*__pixel))
 
 
 def get(type_: str) -> dict:
-    return __config.get(type_)
+    return Config.__getattribute__(type_)
