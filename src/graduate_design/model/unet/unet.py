@@ -13,7 +13,6 @@ from torch import (
     nn,
     sigmoid,
     optim,
-    where,
 )
 from torch.utils.data import DataLoader, random_split
 from torchnet import meter
@@ -76,7 +75,10 @@ class UNet(BaseNet):
         for i, v in enumerate(self._unique_values):
             label[label == v] = i + 1
         if self.n_classes > 1:
-            label = np.transpose(np.eye(self.n_classes)[label], [2, 0, 1])
+            label = np.transpose(
+                np.eye(self.n_classes)[label],
+                [2, 0, 1]
+            )
         img = (img / 255).astype(np.float32)
         return np.expand_dims(img, axis=0), label.astype(np.int64)
 
@@ -88,11 +90,6 @@ class UNet(BaseNet):
         epsilon: float = 1e-6
     ):
         assert input.shape == target.shape
-        if input.dim() > 3:
-            input = nn.functional.softmax(input, dim=1).flatten(0, 1)
-            target = target.flatten(0, 1)
-        else:
-            input = sigmoid(input)
         sum_dim = (-1, -2, -3) if reduce_batch_first else (-1, -2)
         inter = 2 * (input * target).sum(dim=sum_dim)
         sets_sum = (input + target).sum(dim=sum_dim)
@@ -103,9 +100,12 @@ class UNet(BaseNet):
         self,
         input: Tensor,
         target: Tensor,
-        multiclass: bool = False
     ):
-        # Dice loss (objective to minimize) between 0 and 1
+        if input.dim() > 3:
+            input = nn.functional.softmax(input, dim=1).float().flatten(0, 1)
+            target = target.flatten(0, 1)
+        else:
+            input = sigmoid(input)
         return 1 - self._dice_coeff(input, target, reduce_batch_first=True)
 
     def load(self, path) -> None:
@@ -222,10 +222,10 @@ class UNet(BaseNet):
                         device=device,
                         memory_format=channels_last
                     )
-                    label = label.to(device=device)
+                    label = label.to(device=device, dtype=torch.float)
 
                     with autocast(device.type, enabled=amp):
-                        pre = self(image).squeeze()
+                        pre = self(image).squeeze(1)
                         loss = loss_func(pre, label)
                         loss += self._dice_loss(pre, label)
                     loss_value = loss.item()
@@ -293,19 +293,14 @@ class UNet(BaseNet):
                         label,
                     )
                 else:
-                    # convert to one-hot format
-                    label = nn.functional.one_hot(
-                        label.long(),
-                        self.n_classes
-                    ).permute(0, 3, 1, 2).float()
                     pre = nn.functional.one_hot(
                         pre.argmax(dim=1),
                         self.n_classes
                     ).permute(0, 3, 1, 2).float()
                     # compute the Dice score, ignoring background
-                    dice_score += self.__multiclass_dice_coeff(
-                        pre[:, 1:],
-                        label[:, 1:],
+                    dice_score += self._dice_coeff(
+                        pre[:, 1:].flatten(0, 1),
+                        label[:, 1:].flatten(0, 1),
                     )
             refresh(advance=image.size(0))
         self.train()
@@ -317,7 +312,13 @@ class UNet(BaseNet):
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
         img = cv2.resize(img, self._origin_size, None, 0., 0., cv2.INTER_CUBIC)
-        label = cv2.resize(label, self._origin_size, None, 0., 0., cv2.INTER_NEAREST)
+        label = cv2.resize(
+            label.argmax(axis=0) if self.n_classes > 1 else label,
+            self._origin_size,
+            None,
+            0., 0.,
+            cv2.INTER_NEAREST
+        )
         return img, label, pre
 
     @inference_mode()
