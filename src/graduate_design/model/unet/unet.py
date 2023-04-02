@@ -101,11 +101,12 @@ class UNet(BaseNet):
         input: Tensor,
         target: Tensor,
     ):
-        if input.dim() > 3:
-            input = nn.functional.softmax(input, dim=1).float().flatten(0, 1)
+        if self.n_classes > 1:
+            input = nn.functional.softmax(input, dim=1).flatten(0, 1).float()
             target = target.flatten(0, 1)
         else:
             input = sigmoid(input)
+            target = target.float()
         return 1 - self._dice_coeff(input, target, reduce_batch_first=True)
 
     def load(self, path) -> None:
@@ -222,7 +223,7 @@ class UNet(BaseNet):
                         device=device,
                         memory_format=channels_last
                     )
-                    label = label.to(device=device, dtype=torch.float)
+                    label = label.to(device=device)
 
                     with autocast(device.type, enabled=amp):
                         pre = self(image).squeeze(1)
