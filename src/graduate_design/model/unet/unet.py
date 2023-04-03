@@ -92,7 +92,8 @@ class UNet(BaseNet):
         assert input.shape == target.shape
         sum_dim = (-1, -2, -3) if reduce_batch_first else (-1, -2)
         inter = 2 * (input * target).sum(dim=sum_dim)
-        sets_sum = (input + target).sum(dim=sum_dim)
+        sets_sum = input.sum(dim=sum_dim) + target.sum(dim=sum_dim)
+        sets_sum = torch.where(sets_sum == 0, inter, sets_sum)
         dice = (inter + epsilon) / (sets_sum + epsilon)
         return dice.mean()
 
@@ -102,11 +103,10 @@ class UNet(BaseNet):
         target: Tensor,
     ):
         if self.n_classes > 1:
-            input = nn.functional.softmax(input, dim=1).flatten(0, 1).float()
+            input = nn.functional.softmax(input, dim=1).flatten(0, 1)
             target = target.flatten(0, 1)
         else:
             input = sigmoid(input)
-            target = target.float()
         return 1 - self._dice_coeff(input, target, reduce_batch_first=True)
 
     def load(self, path) -> None:
