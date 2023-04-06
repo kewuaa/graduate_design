@@ -60,7 +60,10 @@ def init():
     unet = UnetConfig(**config.get('unet', {}))
     if not (unet.n_classes and unet.unique_values):
         if type(data.pixel) is int:
-            unet.n_classes = 1
+            if unet.n_classes:
+                assert unet.n_classes == 2
+            else:
+                unet.n_classes = 1
             unet.unique_values = [data.pixel]
         else:
             unet.unique_values = list(range(*data.pixel))
