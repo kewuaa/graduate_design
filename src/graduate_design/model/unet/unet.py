@@ -320,6 +320,8 @@ class UNet(BaseNet):
             0., 0.,
             cv2.INTER_NEAREST
         )
+        for i, v in enumerate(self._unique_values):
+            label[label == i + 1] = v
         return img, label, pre
 
     @inference_mode()
