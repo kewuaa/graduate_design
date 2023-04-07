@@ -28,9 +28,12 @@ exts = [
     Extension(
         name='src.graduate_design.data.transformer.cpptrans',
         sources=[
-            'cpp\\radon_transform\\src\\main.cpp'
+            './cpp/src/pymodule.cpp',
+            './cpp/src/pygil.cpp',
+            './cpp/src/radon_transform.cpp',
         ],
         include_dirs=[
+            './cpp/include',
             pybind11_home + '/include',
             opencv_home + '/include'
         ],

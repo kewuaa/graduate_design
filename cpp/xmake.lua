@@ -1,12 +1,14 @@
 ---@diagnostic disable: undefined-global
-add_rules("mode.debug", "mode.release")
 local opencv_home = os.getenv('OPENCV_HOME')
 local pybind11_home = os.getenv('PYBIND11_HOME')
 local python3_home = os.getenv('PYTHON3_HOME')
+add_rules("mode.debug", "mode.release")
 
-target("radon_transform")
-    set_kind("shared")
-    add_files("src/*.cpp")
+target("cpp_")
+    set_kind("binary")
+    add_files("src/main.cpp")
+    add_files("src/radon_transform.cpp")
+    add_includedirs('./include')
     -- python3
     add_includedirs(python3_home .. '/include')
     -- pybind11

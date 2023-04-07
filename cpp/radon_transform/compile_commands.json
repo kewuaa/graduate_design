@@ -1,6 +1,0 @@
-[
-{
-  "directory": "D:\\Code\\pycode\\graduate_design\\cpp\\radon_transform",
-  "arguments": ["D:\\Softwares\\Program_Files\\C\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-O3", "-ID:\\Softwares\\Program_Files\\Python\\python39\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\pybind11\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\opencv\\install\\include", "-DNDEBUG", "-o", "build\\.objs\\radon_transform\\mingw\\x86_64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
-  "file": "src\\main.cpp"
-}]

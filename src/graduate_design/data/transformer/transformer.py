@@ -32,9 +32,8 @@ class Transformer:
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
-        self._trans = cpptrans.Transform()
         self._radon = partial(
-            self._trans.radon_transform_with_noise,
+            cpptrans.radon_transform_with_noise,
             theta=theta_step,
             start_angle=start_angle,
             end_angle=end_angle,
