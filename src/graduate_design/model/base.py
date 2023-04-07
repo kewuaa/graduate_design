@@ -35,6 +35,7 @@ class BaseNet(torch.nn.Module):
             index = self._config.epoch_num
         pth_file_path = self._checkpoint_dir / f'checkpoint_epoch{index}.pth'
         self.load(str(pth_file_path))
+        self.print_config()
 
     def load(self, path: Path) -> None:
         state_dict: dict = torch.load(path)
