@@ -3,10 +3,9 @@
 
 # os.add_dll_directory(r'D:\Softwares\Program_Files\C\mingw64\bin')
 # os.add_dll_directory(r'D:\Softwares\Program_Files\C\cpplibs\opencv\install\x64\mingw\bin')
-# import transform
-# transformer = transform.Transform()
-# img = transformer.radon_transform_with_noise(
-#     r"D:\Code\pycode\graduate_design\data\imgs\1.png",
+# import cpptrans
+# img = cpptrans.radon_transform_with_noise(
+#     r"D:\Code\py\graduate_design\data\120x120_100_255_10_3_[0, 180]_1_without_noise\imgs\1.png",
 #     1.5
 # )
 # plt.imshow(img, cmap='gray')
