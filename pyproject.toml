@@ -2,13 +2,25 @@
 requires = ["setuptools", "Cython"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "graduate_design"
+description = "personal graduate design"
+version = "0.0.1"
+readme = "README.md"
+keywords = ["CT", "THZ", "deep learning"]
+dependencies = [
+    "numpy",
+    "torch",
+    "torchnet",
+    "pillow",
+    "matplotlib",
+    "rich",
+    "opencv-contrib-python",
+    "tomli",
+]
+
 [tool.setuptools]
 include-package-data = true
-
-# [tool.setuptools.exclude-package-data]
-# graduate_design = [
-#     "utils/cython_lib/*.c"
-# ]
 
 [tool.jedi]
 venv = 'ai'
