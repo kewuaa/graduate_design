@@ -1,11 +1,10 @@
-.pytest_cache/
-real_data/
-.venv
 /data
 /config.toml
+.pytest_cache/
+real_data/
 release/
 __pycache__/
 build/
-*.png
+src/graduate_design/cylib/*.c
+src/graduate_design/cylib/*.cpp
 *.pyd
-*.c
