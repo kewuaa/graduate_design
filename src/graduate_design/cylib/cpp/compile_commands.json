@@ -1,11 +1,11 @@
 [
 {
-  "directory": "D:\\Code\\py\\graduate_design\\cpp_",
-  "arguments": ["D:\\Softwares\\Program_Files\\C\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-Iinclude", "-ID:\\Softwares\\Program_Files\\Python\\python39\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\pybind11\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\opencv\\install\\include", "-DNDEBUG", "-o", "build\\.objs\\cpp_\\mingw\\x86_64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "directory": "D:\\Code\\py\\graduate_design\\src\\graduate_design\\cylib\\cpp",
+  "arguments": ["D:\\Softwares\\Program_Files\\C\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-Iinclude", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\opencv\\install\\shared\\include", "-DNDEBUG", "-o", "build\\.objs\\cpp_\\mingw\\x86_64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
   "file": "src\\main.cpp"
 },
 {
-  "directory": "D:\\Code\\py\\graduate_design\\cpp_",
-  "arguments": ["D:\\Softwares\\Program_Files\\C\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-Iinclude", "-ID:\\Softwares\\Program_Files\\Python\\python39\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\pybind11\\include", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\opencv\\install\\include", "-DNDEBUG", "-o", "build\\.objs\\cpp_\\mingw\\x86_64\\release\\src\\radon_transform.cpp.obj", "src\\radon_transform.cpp"],
+  "directory": "D:\\Code\\py\\graduate_design\\src\\graduate_design\\cylib\\cpp",
+  "arguments": ["D:\\Softwares\\Program_Files\\C\\mingw64\\bin\\x86_64-w64-mingw32-g++.exe", "-c", "-m64", "-fvisibility=hidden", "-fvisibility-inlines-hidden", "-O3", "-Iinclude", "-ID:\\Softwares\\Program_Files\\C\\cpplibs\\opencv\\install\\shared\\include", "-DNDEBUG", "-o", "build\\.objs\\cpp_\\mingw\\x86_64\\release\\src\\radon_transform.cpp.obj", "src\\radon_transform.cpp"],
   "file": "src\\radon_transform.cpp"
 }]
