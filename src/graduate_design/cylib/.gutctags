@@ -1,0 +1,4 @@
+--exclude=circle.c
+--exclude=circle.cpp
+--exclude=transform.c
+--exclude=transform.cpp

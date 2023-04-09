@@ -1,7 +1,5 @@
 ---@diagnostic disable: undefined-global
 local opencv_home = os.getenv('OPENCV_HOME')
-local pybind11_home = os.getenv('PYBIND11_HOME')
-local python3_home = os.getenv('PYTHON3_HOME')
 add_rules("mode.debug", "mode.release")
 
 target("cpp_")
@@ -9,10 +7,6 @@ target("cpp_")
     add_files("src/main.cpp")
     add_files("src/radon_transform.cpp")
     add_includedirs('./include')
-    -- python3
-    add_includedirs(python3_home .. '/include')
-    -- pybind11
-    add_includedirs(pybind11_home .. '/include')
     -- opencv
     add_linkdirs(opencv_home .. '/x64/mingw/lib')
     add_includedirs(opencv_home .. '/include')

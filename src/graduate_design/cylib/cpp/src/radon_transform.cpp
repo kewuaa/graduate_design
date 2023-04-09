@@ -1,28 +1,34 @@
-#include <iostream>
-#include "pybind11/detail/common.h"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/opencv.hpp"
 #include "radon_transform.hpp"
+#include <vector>
 
 
-RadonTransformer::RadonTransformer(): u(3, 6) {}
-
-
-cv::Mat RadonTransformer::radon_transform_with_noise(
-    const char *img_path,
-    double theta,
-    double start_angle,
-    double end_angle,
+RadonTransformer::RadonTransformer(
+    float theta,
+    float start_angle,
+    float end_angle,
     bool crop,
     bool norm,
     bool add_noise
+):
+    u(3, 6),
+    _theta(theta), _start_angle(start_angle), _end_angle(end_angle),
+    _crop(crop), _norm(norm), _add_noise(add_noise) {}
+
+
+void RadonTransformer::radon_transform_with_noise(
+    const char* bytes,
+    unsigned int byte_length,
+    std::vector<unsigned char>& out_buf
 )
 {
-    cv::Mat _srcMat = cv::imread(img_path, cv::IMREAD_GRAYSCALE);
-    CV_Assert(_srcMat.dims == 2);
-    CV_Assert(_srcMat.channels() == 1);
-    CV_Assert((end_angle - start_angle) * theta > 0);
+    CV_Assert((_end_angle - _start_angle) * _theta > 0);
+    std::vector<unsigned char> _v(bytes, bytes + byte_length);
+    cv::Mat _srcMat = cv::imdecode(_v, cv::IMREAD_GRAYSCALE);
 
     int _row_num, _col_num, _out_mat_type;
-    _col_num = cvRound((end_angle - start_angle) / theta);
+    _col_num = cvRound((_end_angle - _start_angle) / _theta);
     transpose(_srcMat, _srcMat);
     cv::Mat _masked_src;
     cv::Point _center;
@@ -34,7 +40,7 @@ cv::Mat RadonTransformer::radon_transform_with_noise(
         _out_mat_type = CV_32FC1;
     }
 
-    if (crop) {
+    if (_crop) {
         // crop the source into square
         _row_num = cv::min(_srcMat.rows, _srcMat.cols);
         cv::Rect _crop_ROI(
@@ -71,23 +77,23 @@ cv::Mat RadonTransformer::radon_transform_with_noise(
 
     for (int _col = 0; _col < _col_num; _col++) {
         // rotate the source by _t
-        _t = (start_angle + _col * theta);
+        _t = (_start_angle + _col * _theta);
         cv::Mat _r_matrix = cv::getRotationMatrix2D(_center, _t, 1);
         cv::warpAffine(_masked_src, _rotated_src, _r_matrix, _masked_src.size());
         cv::Mat _col_mat = _radon.col(_col);
         // make projection
         cv::reduce(_rotated_src, _col_mat, 1, cv::REDUCE_SUM, _out_mat_type);
         // add noise
-        if (add_noise && _col % u(e) == 0) {
+        if (_add_noise && _col % u(e) == 0) {
             cv::filter2D(_col_mat, _col_mat, -1, _kernel);
         }
     }
 
-    if (norm) {
+    if (_norm) {
         normalize(_radon, _radon, 0, 255, cv::NORM_MINMAX, CV_8UC1);
     }
-    if (add_noise) {
+    if (_add_noise) {
         cv::GaussianBlur(_radon, _radon, {5, 5}, 1.5);
     }
-    return _radon;
+    cv::imencode(".png", _radon, out_buf);
 }

@@ -2,9 +2,8 @@ import os
 import asyncio
 from distutils import spawn
 from pathlib import Path
-from functools import partial
 
-import cv2
+import aiofiles
 
 opencv_home = os.environ.get('OPENCV_HOME')
 if opencv_home is None:
@@ -14,7 +13,7 @@ if not mingw_path:
     raise RuntimeError('stdc lib not find')
 os.add_dll_directory(mingw_path + '/..')
 os.add_dll_directory(opencv_home + '/x64/mingw/bin')
-from . import cpptrans
+from ...cylib import ctrans
 
 
 class Transformer:
@@ -32,55 +31,22 @@ class Transformer:
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
-        self._radon = partial(
-            cpptrans.radon_transform_with_noise,
-            theta=theta_step,
-            start_angle=start_angle,
-            end_angle=end_angle,
-            add_noise=add_noise
-        )
-
-    # def _radon(self, img):
-    #     img = cv2.normalize(
-    #         img, None,
-    #         -0.5, 0.5,
-    #         cv2.NORM_MINMAX,
-    #         cv2.CV_32F
-    #     )
-    #     return cv2.ximgproc.RadonTransform(
-    #         img,
-    #         theta=self._theta_step,
-    #         crop=True,
-    #         start_angle=self._start_angle,
-    #         end_angle=self._end_angle,
-    #         norm=True,
-    #     )
+        self._radon = ctrans.Radon(theta_step, start_angle, end_angle, 1, 1, 1)
 
     async def _transform(self, name, refresh=None):
         img_file = self._source_path / name
         save_path = self._target_path / name
         while not img_file.exists():
             await asyncio.sleep(1.5)
-        # image = None
-        # while image is None:
-        #     image = await self._loop.run_in_executor(
-        #         None,
-        #         cv2.imread,
-        #         str(img_file),
-        #         cv2.IMREAD_GRAYSCALE
-        #     )
-        # sinogram = self._radon(image)
+        async with aiofiles.open(img_file, 'rb') as f:
+            data = await f.read()
         sinogram = await self._loop.run_in_executor(
             None,
-            self._radon,
-            str(img_file),
+            self._radon.run,
+            data,
         )
-        await self._loop.run_in_executor(
-            None,
-            cv2.imwrite,
-            str(save_path),
-            sinogram
-        )
+        async with aiofiles.open(save_path, 'wb') as f:
+            await f.write(sinogram)
         if callable(refresh):
             refresh()
 

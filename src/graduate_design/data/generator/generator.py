@@ -6,7 +6,7 @@ import asyncio
 
 from PIL import Image, ImageDraw
 
-from . import circle
+from ...cylib import circle
 
 
 class Generator:

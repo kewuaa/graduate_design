@@ -1,41 +1,26 @@
 import os
 
-import numpy as np
 from setuptools import setup, Extension
 from Cython.Build import cythonize
+opencv_home = os.environ['OPENCV_HOME']
 
 
 cython_exts = [
     Extension(
-        name='src.graduate_design.data.generator.circle',
+        name='src.graduate_design.cylib.circle',
         sources=[
-            'cython\\circle.pyx',
+            'src\\graduate_design\\cylib\\circle.pyx',
         ]
     ),
     Extension(
-        name='src.graduate_design.data.transformer.ctrans',
+        name='src.graduate_design.cylib.ctrans',
         sources=[
-            'cython\\transform.pyx',
+            'src\\graduate_design\\cylib\\transform.pyx',
+            'src\\graduate_design\\cylib\\cpp\\src\\radon_transform.cpp'
         ],
         include_dirs=[
-            np.get_include(),
-        ],
-    ),
-]
-opencv_home = os.environ['OPENCV_HOME']
-pybind11_home = os.environ['PYBIND11_HOME']
-exts = [
-    Extension(
-        name='src.graduate_design.data.transformer.cpptrans',
-        sources=[
-            './cpp/src/pymodule.cpp',
-            './cpp/src/pygil.cpp',
-            './cpp/src/radon_transform.cpp',
-        ],
-        include_dirs=[
-            './cpp/include',
-            pybind11_home + '/include',
-            opencv_home + '/include'
+            opencv_home + '/include',
+            'src\\graduate_design\\cylib\\cpp\\include'
         ],
         library_dirs=[
             opencv_home + '/x64/mingw/lib'
@@ -43,8 +28,8 @@ exts = [
         libraries=[
             'opencv_world470',
         ]
-    )
+    ),
 ]
 setup(
-    ext_modules=cythonize(cython_exts) + exts
+    ext_modules=cythonize(cython_exts)
 )
