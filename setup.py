@@ -7,13 +7,13 @@ opencv_home = os.environ['OPENCV_HOME']
 
 cython_exts = [
     Extension(
-        name='src.graduate_design.cylib.circle',
+        name='graduate_design.cylib.circle',
         sources=[
             'src\\graduate_design\\cylib\\circle.pyx',
         ]
     ),
     Extension(
-        name='src.graduate_design.cylib.ctrans',
+        name='graduate_design.cylib.ctrans',
         sources=[
             'src\\graduate_design\\cylib\\transform.pyx',
             'src\\graduate_design\\cylib\\cpp\\src\\radon_transform.cpp'
@@ -31,5 +31,7 @@ cython_exts = [
     ),
 ]
 setup(
-    ext_modules=cythonize(cython_exts)
+    ext_modules=cythonize(cython_exts),
+    zip_safe=False,
+    package_dir={'graduate_design': 'src/graduate_design'}
 )
