@@ -262,7 +262,7 @@ class UNet(BaseNet):
                 pre = self(image)
 
                 if self.n_classes == 1:
-                    pre = (nn.functional.sigmoid(pre.squeeze(1)) > 0.5).float()
+                    pre = (torch.sigmoid(pre.squeeze(1)) > 0.5).float()
                     # compute the Dice score
                     dice_score += losses.dice_coeff(
                         pre,
@@ -313,7 +313,7 @@ class UNet(BaseNet):
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
-            pre = nn.functional.sigmoid(pre) > 0.5
+            pre = torch.sigmoid(pre) > 0.5
         pre = pre.cpu().squeeze().numpy()
         for i, v in enumerate(self._unique_values):
             pre[pre == i + 1] = v

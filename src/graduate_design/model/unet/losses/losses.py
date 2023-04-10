@@ -54,7 +54,7 @@ class NormalLoss(nn.Module):
     def _single(self, input, target):
         loss = self._loss_func(input, target)
         loss += 1 - dice_coeff(
-            F.sigmoid(input),
+            torch.sigmoid(input),
             target,
             reduce_batch_first=True
         )
