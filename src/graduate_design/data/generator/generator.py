@@ -1,9 +1,11 @@
 from typing import Union
 from functools import partial
 from pathlib import Path
+from io import BytesIO
 import random
 import asyncio
 
+import aiofiles
 from PIL import Image, ImageDraw
 
 from ...cylib import circle
@@ -59,14 +61,12 @@ class Generator:
                 fill=alpha,
                 outline=alpha,
             )
-        await self._loop.run_in_executor(
-            None,
-            partial(
-                img.save,
-                str(self._img_save_path / f'{index + 1}.png'),
-                # dpi=(300, 300),
-            )
-        )
+        img_bytes = BytesIO()
+        img.save(img_bytes, format='PNG')
+        async with aiofiles.open(
+            self._img_save_path / f'{index + 1}.png', 'wb'
+        ) as f:
+            await f.write(img_bytes.getvalue())
         if callable(refresh):
             refresh()
 
