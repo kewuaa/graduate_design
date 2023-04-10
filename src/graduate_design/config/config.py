@@ -48,6 +48,7 @@ class UnetConfig(ModelConfig):
     unique_values: tuple = None
     momentum: float = 1.
     gradient_clipping: float = 1.
+    loss: str = 'normal'
 
 
 def init():

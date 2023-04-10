@@ -11,7 +11,6 @@ from torch import (
     cuda,
     inference_mode,
     nn,
-    sigmoid,
     optim,
 )
 from torch.utils.data import DataLoader, random_split
@@ -20,6 +19,7 @@ from torchnet import meter
 from ...utils.visdom import Visualizer
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
+from . import losses
 
 
 class UNet(BaseNet):
@@ -81,33 +81,6 @@ class UNet(BaseNet):
             )
         img = (img / 255).astype(np.float32)
         return np.expand_dims(img, axis=0), label.astype(np.int64)
-
-    def _dice_coeff(
-        self,
-        input: Tensor,
-        target: Tensor,
-        reduce_batch_first: bool = False,
-        epsilon: float = 1e-6
-    ):
-        assert input.shape == target.shape
-        sum_dim = (-1, -2, -3) if reduce_batch_first else (-1, -2)
-        inter = 2 * (input * target).sum(dim=sum_dim)
-        sets_sum = input.sum(dim=sum_dim) + target.sum(dim=sum_dim)
-        sets_sum = torch.where(sets_sum == 0, inter, sets_sum)
-        dice = (inter + epsilon) / (sets_sum + epsilon)
-        return dice.mean()
-
-    def _dice_loss(
-        self,
-        input: Tensor,
-        target: Tensor,
-    ):
-        if self.n_classes > 1:
-            input = nn.functional.softmax(input, dim=1).flatten(0, 1)
-            target = target.flatten(0, 1)
-        else:
-            input = sigmoid(input)
-        return 1 - self._dice_coeff(input, target, reduce_batch_first=True)
 
     def load(self, path) -> None:
         state_dict = torch.load(path)
@@ -171,9 +144,12 @@ class UNet(BaseNet):
             patience=5,
         )
         grad_scaler = cuda.amp.GradScaler(enabled=amp)
-        loss_func = nn.CrossEntropyLoss() \
-            if self.n_classes > 1 else nn.BCEWithLogitsLoss()
-
+        if config.loss == 'normal':
+            loss_func = losses.NormalLoss
+        elif config.loss == 'lovasz':
+            loss_func = losses.LovaszLoss
+        else:
+            raise RuntimeError(f'bad config: invalid loss type: {config.loss}')
         # 指标
         loss_meter = meter.AverageValueMeter()
 
@@ -228,7 +204,6 @@ class UNet(BaseNet):
                     with autocast(device.type, enabled=amp):
                         pre = self(image).squeeze(1)
                         loss = loss_func(pre, label)
-                        loss += self._dice_loss(pre, label)
                     loss_value = loss.item()
                     loss_meter.add(loss_value)
                     optimizer.zero_grad(set_to_none=True)
@@ -287,9 +262,9 @@ class UNet(BaseNet):
                 pre = self(image)
 
                 if self.n_classes == 1:
-                    pre = (sigmoid(pre.squeeze(1)) > 0.5).float()
+                    pre = (nn.functional.sigmoid(pre.squeeze(1)) > 0.5).float()
                     # compute the Dice score
-                    dice_score += self._dice_coeff(
+                    dice_score += losses.dice_coeff(
                         pre,
                         label,
                     )
@@ -299,7 +274,7 @@ class UNet(BaseNet):
                         self.n_classes
                     ).permute(0, 3, 1, 2).float()
                     # compute the Dice score, ignoring background
-                    dice_score += self._dice_coeff(
+                    dice_score += losses.dice_coeff(
                         pre[:, 1:].flatten(0, 1),
                         label[:, 1:].flatten(0, 1),
                     )
@@ -338,7 +313,7 @@ class UNet(BaseNet):
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
-            pre = sigmoid(pre) > 0.5
+            pre = nn.functional.sigmoid(pre) > 0.5
         pre = pre.cpu().squeeze().numpy()
         for i, v in enumerate(self._unique_values):
             pre[pre == i + 1] = v

@@ -30,3 +30,4 @@ weight_decay = 1e-8
 amp = true
 momentum = 1.0
 gradient_clipping = 1.0
+loss = 'normal'
