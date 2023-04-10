@@ -36,10 +36,10 @@ class NormalLoss(nn.Module):
     def __init__(self, n_classes):
         super().__init__()
         if n_classes > 1:
-            self._loss_func = nn.CrossEntropyLoss
+            self._loss_func = nn.CrossEntropyLoss()
             self.forward = self._multiple
         else:
-            self._loss_func = nn.BCEWithLogitsLoss
+            self._loss_func = nn.BCEWithLogitsLoss()
             self.forward = self._single
 
     def _multiple(self, input, target):
