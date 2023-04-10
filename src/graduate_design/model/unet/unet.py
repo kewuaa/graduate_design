@@ -145,9 +145,9 @@ class UNet(BaseNet):
         )
         grad_scaler = cuda.amp.GradScaler(enabled=amp)
         if config.loss == 'normal':
-            loss_func = losses.NormalLoss
+            loss_func = losses.NormalLoss(self.n_classes)
         elif config.loss == 'lovasz':
-            loss_func = losses.LovaszLoss
+            loss_func = losses.LovaszLoss(self.n_classes)
         else:
             raise RuntimeError(f'bad config: invalid loss type: {config.loss}')
         # 指标
