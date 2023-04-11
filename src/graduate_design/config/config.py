@@ -42,6 +42,7 @@ class ModelConfig:
     learning_rate: float = 1e-5
     validation_percent: float = 0.1
     weight_decay: float = 1e-8
+    optimizer: str = 'rms'
     amp: bool = True
 
 
@@ -56,7 +57,6 @@ class UnetConfig(ModelConfig):
     unique_values: tuple = None
     momentum: float = 1.
     gradient_clipping: float = 1.
-    optimizer: str = 'rms'
     betas: tuple = (0.9, 0.9)
     nesterov: bool = True
     loss: str = 'normal'
