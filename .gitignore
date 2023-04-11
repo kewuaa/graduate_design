@@ -5,6 +5,4 @@ real_data/
 release/
 __pycache__/
 build/
-src/graduate_design/cylib/*.c
-src/graduate_design/cylib/*.cpp
 *.pyd

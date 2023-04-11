@@ -1,21 +1,28 @@
 import os
 
 from setuptools import setup, Extension
-from Cython.Build import cythonize
 opencv_home = os.environ['OPENCV_HOME']
+files = (
+    'src\\graduate_design\\cylib\\circle.c',
+    'src\\graduate_design\\cylib\\transform.cpp'
+)
+suffix = ''
+if not all(os.path.exists(file) for file in files):
+    from Cython.Build import cythonize
+    suffix = 'pyx'
 
 
-cython_exts = [
+exts = [
     Extension(
         name='graduate_design.cylib.circle',
         sources=[
-            'src\\graduate_design\\cylib\\circle.pyx',
+            f'src\\graduate_design\\cylib\\circle.{suffix or "c"}',
         ]
     ),
     Extension(
         name='graduate_design.cylib.ctrans',
         sources=[
-            'src\\graduate_design\\cylib\\transform.pyx',
+            f'src\\graduate_design\\cylib\\transform.{suffix or "cpp"}',
             'src\\graduate_design\\cylib\\cpp\\src\\radon_transform.cpp'
         ],
         include_dirs=[
@@ -30,8 +37,10 @@ cython_exts = [
         ]
     ),
 ]
+if suffix:
+    exts = cythonize(exts)
 setup(
-    ext_modules=cythonize(cython_exts),
+    ext_modules=exts,
     zip_safe=False,
     package_dir={'graduate_design': 'src/graduate_design'}
 )
