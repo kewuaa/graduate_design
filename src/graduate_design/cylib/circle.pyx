@@ -24,6 +24,7 @@ cdef class Circle:
     cdef:
         double left, bottom, width, height, center[2]
         double size_range, min_size, inscribed_r
+
     def __init__(
         self,
         double left,

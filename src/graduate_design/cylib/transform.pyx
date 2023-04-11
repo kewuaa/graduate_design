@@ -3,8 +3,6 @@
 # cython: wraparound=False
 # cython: cdivision=True
 # distutils: language=c++
-import cv2
-import numpy as np
 from libcpp.vector cimport vector
 from libcpp.string cimport string
 from .radon_transform cimport RadonTransformer
