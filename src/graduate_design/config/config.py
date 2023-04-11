@@ -48,13 +48,15 @@ class UnetConfig(ModelConfig):
     unique_values: tuple = None
     momentum: float = 1.
     gradient_clipping: float = 1.
+    optimizer: str = 'rms'
+    betas: tuple = (0.9, 0.9)
     loss: str = 'normal'
 
 
 def init():
     global __config
     if config_file.exists():
-        with open(config_file) as f:
+        with open(config_file, 'rb') as f:
             config = toml.load(f)
     data = DataConfig(**config.get('data', {}))
     automap = AutomapConfig(**config.get('automap', {}))

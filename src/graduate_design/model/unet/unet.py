@@ -109,6 +109,7 @@ class UNet(BaseNet):
         learning_rate = config.learning_rate
         weight_decay = config.weight_decay
         momentum = config.momentum
+        betas = config.betas
         gradient_clipping = config.gradient_clipping
         amp = config.amp and device.type == 'cuda'
         self.print_config()
@@ -131,13 +132,25 @@ class UNet(BaseNet):
 
         # 4. Set up the optimizer, the loss, the learning rate scheduler
         # and the loss scaling for AMP
-        optimizer = optim.RMSprop(
-            self.parameters(),
-            lr=learning_rate,
-            weight_decay=weight_decay,
-            momentum=momentum,
-            foreach=True,
-        )
+        if config.optimizer == 'adam':
+            optimizer = optim.Adam(
+                self.parameters(),
+                lr=learning_rate,
+                betas=betas,
+                weight_decay=weight_decay
+            )
+        elif config.optimizer == 'rms':
+            optimizer = optim.RMSprop(
+                self.parameters(),
+                lr=learning_rate,
+                weight_decay=weight_decay,
+                momentum=momentum,
+                foreach=True,
+            )
+        else:
+            raise RuntimeWarning(
+                f'bad config: invalid optimizer type: {config.optimizer}'
+            )
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
             'max',
