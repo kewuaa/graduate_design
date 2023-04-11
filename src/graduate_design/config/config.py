@@ -58,6 +58,7 @@ class UnetConfig(ModelConfig):
     gradient_clipping: float = 1.
     optimizer: str = 'rms'
     betas: tuple = (0.9, 0.9)
+    nesterov: bool = True
     loss: str = 'normal'
 
 

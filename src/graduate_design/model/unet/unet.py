@@ -109,7 +109,6 @@ class UNet(BaseNet):
         learning_rate = config.learning_rate
         weight_decay = config.weight_decay
         momentum = config.momentum
-        betas = config.betas
         gradient_clipping = config.gradient_clipping
         amp = config.amp and device.type == 'cuda'
         self.print_config()
@@ -136,8 +135,15 @@ class UNet(BaseNet):
             optimizer = optim.Adam(
                 self.parameters(),
                 lr=learning_rate,
-                betas=betas,
+                betas=config.betas,
                 weight_decay=weight_decay
+            )
+        elif config.optimizer == 'sgd':
+            optimizer = optim.SGD(
+                self.parameters(),
+                lr=learning_rate,
+                momentum=momentum,
+                nesterov=config.nesterov,
             )
         elif config.optimizer == 'rms':
             optimizer = optim.RMSprop(
