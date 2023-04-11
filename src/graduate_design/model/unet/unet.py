@@ -79,7 +79,7 @@ class UNet(BaseNet):
                 np.eye(self.n_classes)[label],
                 [2, 0, 1]
             )
-        img = (img / 255).astype(np.float32)
+        img = np.round(img / 255, 1).astype(np.float32)
         return np.expand_dims(img, axis=0), label.astype(np.int64)
 
     def load(self, path) -> None:
