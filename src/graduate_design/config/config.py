@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 try:
-    import rtoml as toml
+    import tomllib as toml
 except ImportError:
-    import tomli as toml
+    import rtoml as toml
 config_file = Path('./config.toml')
 __config = {}
 
