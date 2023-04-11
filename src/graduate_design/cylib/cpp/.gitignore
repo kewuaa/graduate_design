@@ -3,5 +3,5 @@
 .cache/
 .xmake/
 build/
-
+/src/main.cpp
 
