@@ -1016,7 +1016,7 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_15graduate_design_5cylib_6ctrans_Radon;
 
-/* "src/graduate_design/cylib/transform.pyx":13
+/* "src/graduate_design/cylib/transform.pyx":11
  * 
  * 
  * cdef class Radon:             # <<<<<<<<<<<<<<
@@ -1280,9 +1280,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetAttrStrNoError(PyObject* obj, P
 /* SetupReduce.proto */
 static int __Pyx_setup_reduce(PyObject* type_obj);
 
-/* Import.proto */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
-
 /* CLineInTraceback.proto */
 #ifdef CYTHON_CLINE_IN_TRACEBACK
 #define __Pyx_CLineForTraceback(tstate, c_line)  (((CYTHON_CLINE_IN_TRACEBACK)) ? c_line : 0)
@@ -1410,8 +1407,6 @@ int __pyx_module_is_main_graduate_design__cylib__ctrans = 0;
 
 /* Implementation of 'graduate_design.cylib.ctrans' */
 static PyObject *__pyx_builtin_TypeError;
-static const char __pyx_k_np[] = "np";
-static const char __pyx_k_cv2[] = "cv2";
 static const char __pyx_k_run[] = "run";
 static const char __pyx_k_crop[] = "crop";
 static const char __pyx_k_main[] = "__main__";
@@ -1419,9 +1414,7 @@ static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_norm[] = "norm";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_Radon[] = "Radon";
-static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_theta[] = "theta";
-static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_reduce[] = "__reduce__";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_setstate[] = "__setstate__";
@@ -1440,15 +1433,11 @@ static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_n_s_add_noise;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_crop;
-static PyObject *__pyx_n_s_cv2;
 static PyObject *__pyx_n_s_end_angle;
 static PyObject *__pyx_n_s_getstate;
-static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_norm;
-static PyObject *__pyx_n_s_np;
-static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_reduce;
 static PyObject *__pyx_n_s_reduce_cython;
@@ -1469,7 +1458,7 @@ static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
 /* Late includes */
 
-/* "src/graduate_design/cylib/transform.pyx":16
+/* "src/graduate_design/cylib/transform.pyx":14
  *     cdef RadonTransformer radon_transformer
  * 
  *     def __init__(             # <<<<<<<<<<<<<<
@@ -1523,35 +1512,35 @@ static int __pyx_pw_15graduate_design_5cylib_6ctrans_5Radon_1__init__(PyObject *
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_start_angle)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 1); __PYX_ERR(1, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 1); __PYX_ERR(1, 14, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_end_angle)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 2); __PYX_ERR(1, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 2); __PYX_ERR(1, 14, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_crop)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 3); __PYX_ERR(1, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 3); __PYX_ERR(1, 14, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_norm)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 4); __PYX_ERR(1, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 4); __PYX_ERR(1, 14, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  5:
         if (likely((values[5] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_add_noise)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 5); __PYX_ERR(1, 16, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, 5); __PYX_ERR(1, 14, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(1, 16, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(1, 14, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -1563,16 +1552,16 @@ static int __pyx_pw_15graduate_design_5cylib_6ctrans_5Radon_1__init__(PyObject *
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_theta = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_theta == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 18, __pyx_L3_error)
-    __pyx_v_start_angle = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_start_angle == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 19, __pyx_L3_error)
-    __pyx_v_end_angle = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_end_angle == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 20, __pyx_L3_error)
-    __pyx_v_crop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_crop == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 21, __pyx_L3_error)
-    __pyx_v_norm = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_norm == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 22, __pyx_L3_error)
-    __pyx_v_add_noise = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_add_noise == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 23, __pyx_L3_error)
+    __pyx_v_theta = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_theta == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 16, __pyx_L3_error)
+    __pyx_v_start_angle = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_start_angle == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 17, __pyx_L3_error)
+    __pyx_v_end_angle = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_end_angle == (float)-1) && PyErr_Occurred())) __PYX_ERR(1, 18, __pyx_L3_error)
+    __pyx_v_crop = __Pyx_PyObject_IsTrue(values[3]); if (unlikely((__pyx_v_crop == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 19, __pyx_L3_error)
+    __pyx_v_norm = __Pyx_PyObject_IsTrue(values[4]); if (unlikely((__pyx_v_norm == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 20, __pyx_L3_error)
+    __pyx_v_add_noise = __Pyx_PyObject_IsTrue(values[5]); if (unlikely((__pyx_v_add_noise == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 21, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 16, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(1, 14, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("graduate_design.cylib.ctrans.Radon.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1594,7 +1583,7 @@ static int __pyx_pf_15graduate_design_5cylib_6ctrans_5Radon___init__(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "src/graduate_design/cylib/transform.pyx":25
+  /* "src/graduate_design/cylib/transform.pyx":23
  *         bint add_noise
  *     ):
  *         self.radon_transformer = RadonTransformer(             # <<<<<<<<<<<<<<
@@ -1605,11 +1594,11 @@ static int __pyx_pf_15graduate_design_5cylib_6ctrans_5Radon___init__(struct __py
     __pyx_t_1 = RadonTransformer(__pyx_v_theta, __pyx_v_start_angle, __pyx_v_end_angle, __pyx_v_crop, __pyx_v_norm, __pyx_v_add_noise);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(1, 25, __pyx_L1_error)
+    __PYX_ERR(1, 23, __pyx_L1_error)
   }
   __pyx_v_self->radon_transformer = __pyx_t_1;
 
-  /* "src/graduate_design/cylib/transform.pyx":16
+  /* "src/graduate_design/cylib/transform.pyx":14
  *     cdef RadonTransformer radon_transformer
  * 
  *     def __init__(             # <<<<<<<<<<<<<<
@@ -1628,7 +1617,7 @@ static int __pyx_pf_15graduate_design_5cylib_6ctrans_5Radon___init__(struct __py
   return __pyx_r;
 }
 
-/* "src/graduate_design/cylib/transform.pyx":33
+/* "src/graduate_design/cylib/transform.pyx":31
  *         )
  * 
  *     cpdef bytes run(self, bytes data):             # <<<<<<<<<<<<<<
@@ -1664,7 +1653,7 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_type_dict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_run); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 33, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_run); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 31, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_15graduate_design_5cylib_6ctrans_5Radon_3run)) {
         __Pyx_XDECREF(__pyx_r);
@@ -1681,10 +1670,10 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_data) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_data);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 33, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 31, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||((void)PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(1, 33, __pyx_L1_error)
+        if (!(likely(PyBytes_CheckExact(__pyx_t_2))||((__pyx_t_2) == Py_None)||((void)PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_2)->tp_name), 0))) __PYX_ERR(1, 31, __pyx_L1_error)
         __pyx_r = ((PyObject*)__pyx_t_2);
         __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -1703,7 +1692,7 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
     #endif
   }
 
-  /* "src/graduate_design/cylib/transform.pyx":35
+  /* "src/graduate_design/cylib/transform.pyx":33
  *     cpdef bytes run(self, bytes data):
  *         cdef vector[unsigned char] out_buf
  *         cdef const char* _bytes = data             # <<<<<<<<<<<<<<
@@ -1712,12 +1701,12 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
  */
   if (unlikely(__pyx_v_data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(1, 35, __pyx_L1_error)
+    __PYX_ERR(1, 33, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyBytes_AsString(__pyx_v_data); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(1, 35, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyBytes_AsString(__pyx_v_data); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(1, 33, __pyx_L1_error)
   __pyx_v__bytes = __pyx_t_5;
 
-  /* "src/graduate_design/cylib/transform.pyx":36
+  /* "src/graduate_design/cylib/transform.pyx":34
  *         cdef vector[unsigned char] out_buf
  *         cdef const char* _bytes = data
  *         cdef unsigned int _bytes_length = len(data)             # <<<<<<<<<<<<<<
@@ -1726,12 +1715,12 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
  */
   if (unlikely(__pyx_v_data == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(1, 36, __pyx_L1_error)
+    __PYX_ERR(1, 34, __pyx_L1_error)
   }
-  __pyx_t_6 = PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(1, 36, __pyx_L1_error)
+  __pyx_t_6 = PyBytes_GET_SIZE(__pyx_v_data); if (unlikely(__pyx_t_6 == ((Py_ssize_t)-1))) __PYX_ERR(1, 34, __pyx_L1_error)
   __pyx_v__bytes_length = __pyx_t_6;
 
-  /* "src/graduate_design/cylib/transform.pyx":38
+  /* "src/graduate_design/cylib/transform.pyx":36
  *         cdef unsigned int _bytes_length = len(data)
  *         cdef string buf
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -1746,7 +1735,7 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
       #endif
       /*try:*/ {
 
-        /* "src/graduate_design/cylib/transform.pyx":39
+        /* "src/graduate_design/cylib/transform.pyx":37
  *         cdef string buf
  *         with nogil:
  *             self.radon_transformer.radon_transform_with_noise(             # <<<<<<<<<<<<<<
@@ -1755,7 +1744,7 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
  */
         __pyx_v_self->radon_transformer.radon_transform_with_noise(__pyx_v__bytes, __pyx_v__bytes_length, __pyx_v_out_buf);
 
-        /* "src/graduate_design/cylib/transform.pyx":44
+        /* "src/graduate_design/cylib/transform.pyx":42
  *                 out_buf
  *             )
  *             buf = string(<const char*>out_buf.data(), out_buf.size())             # <<<<<<<<<<<<<<
@@ -1771,12 +1760,12 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
           #ifdef WITH_THREAD
           __Pyx_PyGILState_Release(__pyx_gilstate_save);
           #endif
-          __PYX_ERR(1, 44, __pyx_L4_error)
+          __PYX_ERR(1, 42, __pyx_L4_error)
         }
         __pyx_v_buf = __pyx_t_7;
       }
 
-      /* "src/graduate_design/cylib/transform.pyx":38
+      /* "src/graduate_design/cylib/transform.pyx":36
  *         cdef unsigned int _bytes_length = len(data)
  *         cdef string buf
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -1802,19 +1791,19 @@ static PyObject *__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(struct __py
       }
   }
 
-  /* "src/graduate_design/cylib/transform.pyx":45
+  /* "src/graduate_design/cylib/transform.pyx":43
  *             )
  *             buf = string(<const char*>out_buf.data(), out_buf.size())
  *         return buf             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_buf); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 45, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(__pyx_v_buf); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 43, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "src/graduate_design/cylib/transform.pyx":33
+  /* "src/graduate_design/cylib/transform.pyx":31
  *         )
  * 
  *     cpdef bytes run(self, bytes data):             # <<<<<<<<<<<<<<
@@ -1845,7 +1834,7 @@ static PyObject *__pyx_pw_15graduate_design_5cylib_6ctrans_5Radon_3run(PyObject 
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("run (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(1, 33, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_data), (&PyBytes_Type), 1, "data", 1))) __PYX_ERR(1, 31, __pyx_L1_error)
   __pyx_r = __pyx_pf_15graduate_design_5cylib_6ctrans_5Radon_2run(((struct __pyx_obj_15graduate_design_5cylib_6ctrans_Radon *)__pyx_v_self), ((PyObject*)__pyx_v_data));
 
   /* function exit code */
@@ -1866,7 +1855,7 @@ static PyObject *__pyx_pf_15graduate_design_5cylib_6ctrans_5Radon_2run(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("run", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(__pyx_v_self, __pyx_v_data, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 33, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run(__pyx_v_self, __pyx_v_data, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 31, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2402,15 +2391,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_add_noise, __pyx_k_add_noise, sizeof(__pyx_k_add_noise), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_crop, __pyx_k_crop, sizeof(__pyx_k_crop), 0, 0, 1, 1},
-  {&__pyx_n_s_cv2, __pyx_k_cv2, sizeof(__pyx_k_cv2), 0, 0, 1, 1},
   {&__pyx_n_s_end_angle, __pyx_k_end_angle, sizeof(__pyx_k_end_angle), 0, 0, 1, 1},
   {&__pyx_n_s_getstate, __pyx_k_getstate, sizeof(__pyx_k_getstate), 0, 0, 1, 1},
-  {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_norm, __pyx_k_norm, sizeof(__pyx_k_norm), 0, 0, 1, 1},
-  {&__pyx_n_s_np, __pyx_k_np, sizeof(__pyx_k_np), 0, 0, 1, 1},
-  {&__pyx_n_s_numpy, __pyx_k_numpy, sizeof(__pyx_k_numpy), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_reduce, __pyx_k_reduce, sizeof(__pyx_k_reduce), 0, 0, 1, 1},
   {&__pyx_n_s_reduce_cython, __pyx_k_reduce_cython, sizeof(__pyx_k_reduce_cython), 0, 0, 1, 1},
@@ -2508,16 +2493,16 @@ static int __Pyx_modinit_type_init_code(void) {
   /*--- Type init code ---*/
   __pyx_vtabptr_15graduate_design_5cylib_6ctrans_Radon = &__pyx_vtable_15graduate_design_5cylib_6ctrans_Radon;
   __pyx_vtable_15graduate_design_5cylib_6ctrans_Radon.run = (PyObject *(*)(struct __pyx_obj_15graduate_design_5cylib_6ctrans_Radon *, PyObject *, int __pyx_skip_dispatch))__pyx_f_15graduate_design_5cylib_6ctrans_5Radon_run;
-  if (PyType_Ready(&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 13, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 11, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_dictoffset && __pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_dict, __pyx_vtabptr_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 13, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Radon, (PyObject *)&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 13, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 13, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_15graduate_design_5cylib_6ctrans_Radon.tp_dict, __pyx_vtabptr_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 11, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_Radon, (PyObject *)&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 11, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_15graduate_design_5cylib_6ctrans_Radon) < 0) __PYX_ERR(1, 11, __pyx_L1_error)
   __pyx_ptype_15graduate_design_5cylib_6ctrans_Radon = &__pyx_type_15graduate_design_5cylib_6ctrans_Radon;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -2749,30 +2734,6 @@ if (!__Pyx_RefNanny) {
   #if defined(__Pyx_Generator_USED) || defined(__Pyx_Coroutine_USED)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(1, 1, __pyx_L1_error)
   #endif
-
-  /* "src/graduate_design/cylib/transform.pyx":6
- * # cython: cdivision=True
- * # distutils: language=c++
- * import cv2             # <<<<<<<<<<<<<<
- * import numpy as np
- * from libcpp.vector cimport vector
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_cv2, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 6, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cv2, __pyx_t_1) < 0) __PYX_ERR(1, 6, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "src/graduate_design/cylib/transform.pyx":7
- * # distutils: language=c++
- * import cv2
- * import numpy as np             # <<<<<<<<<<<<<<
- * from libcpp.vector cimport vector
- * from libcpp.string cimport string
- */
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_numpy, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 7, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_np, __pyx_t_1) < 0) __PYX_ERR(1, 7, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "src/graduate_design/cylib/transform.pyx":1
  * # cython: language_level=3             # <<<<<<<<<<<<<<
@@ -3702,71 +3663,6 @@ __PYX_GOOD:
     Py_XDECREF(setstate);
     Py_XDECREF(setstate_cython);
     return ret;
-}
-
-/* Import */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
-    PyObject *empty_list = 0;
-    PyObject *module = 0;
-    PyObject *global_dict = 0;
-    PyObject *empty_dict = 0;
-    PyObject *list;
-    #if PY_MAJOR_VERSION < 3
-    PyObject *py_import;
-    py_import = __Pyx_PyObject_GetAttrStr(__pyx_b, __pyx_n_s_import);
-    if (!py_import)
-        goto bad;
-    #endif
-    if (from_list)
-        list = from_list;
-    else {
-        empty_list = PyList_New(0);
-        if (!empty_list)
-            goto bad;
-        list = empty_list;
-    }
-    global_dict = PyModule_GetDict(__pyx_m);
-    if (!global_dict)
-        goto bad;
-    empty_dict = PyDict_New();
-    if (!empty_dict)
-        goto bad;
-    {
-        #if PY_MAJOR_VERSION >= 3
-        if (level == -1) {
-            if ((1) && (strchr(__Pyx_MODULE_NAME, '.'))) {
-                module = PyImport_ImportModuleLevelObject(
-                    name, global_dict, empty_dict, list, 1);
-                if (!module) {
-                    if (!PyErr_ExceptionMatches(PyExc_ImportError))
-                        goto bad;
-                    PyErr_Clear();
-                }
-            }
-            level = 0;
-        }
-        #endif
-        if (!module) {
-            #if PY_MAJOR_VERSION < 3
-            PyObject *py_level = PyInt_FromLong(level);
-            if (!py_level)
-                goto bad;
-            module = PyObject_CallFunctionObjArgs(py_import,
-                name, global_dict, empty_dict, list, py_level, (PyObject *)NULL);
-            Py_DECREF(py_level);
-            #else
-            module = PyImport_ImportModuleLevelObject(
-                name, global_dict, empty_dict, list, level);
-            #endif
-        }
-    }
-bad:
-    #if PY_MAJOR_VERSION < 3
-    Py_XDECREF(py_import);
-    #endif
-    Py_XDECREF(empty_list);
-    Py_XDECREF(empty_dict);
-    return module;
 }
 
 /* CLineInTraceback */
