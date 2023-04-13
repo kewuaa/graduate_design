@@ -43,6 +43,10 @@ class ModelConfig:
     validation_percent: float = 0.1
     weight_decay: float = 1e-8
     optimizer: str = 'rms'
+    momentum: float = 1.
+    betas: tuple = (0.9, 0.9)
+    nesterov: bool = True
+    gradient_clipping: float = 1.
     amp: bool = True
 
 
@@ -55,10 +59,6 @@ class AutomapConfig(ModelConfig):
 class UnetConfig(ModelConfig):
     n_classes: int = 0
     unique_values: tuple = None
-    momentum: float = 1.
-    gradient_clipping: float = 1.
-    betas: tuple = (0.9, 0.9)
-    nesterov: bool = True
     loss: str = 'normal'
 
 
