@@ -1,7 +1,11 @@
 from libcpp.vector cimport vector
 
 
-cdef extern from "radon_transform.hpp" nogil:
+cdef extern from "./cpp/src/radon_transform.cpp" nogil:
+    pass
+
+
+cdef extern from "radon_transform.hpp" namespace "algorithm" nogil:
     cdef cppclass RadonTransformer:
         RadonTransformer() except +
         RadonTransformer(
@@ -12,4 +16,8 @@ cdef extern from "radon_transform.hpp" nogil:
             bint norm,
             bint add_noise
         ) except +
-        void radon_transform_with_noise(const char* _bytes, unsigned int byte_length, vector[unsigned char]& out_buf)
+        void radon_transform_with_noise(
+            const unsigned char* _bytes,
+            unsigned int byte_length,
+            vector[unsigned char]& out_buf
+        )
