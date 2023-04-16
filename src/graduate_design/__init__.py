@@ -19,7 +19,7 @@ def load_model(model_name: str):
 
 
 
-def train(*, device: str = 'cpu'):
+def train(*, device: str = None):
     try:
         net.start_train(device)
     except torch.cuda.OutOfMemoryError:
