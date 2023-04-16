@@ -16,7 +16,10 @@ from .radon_transform cimport RadonTransformer
 
 
 ctypedef unsigned char uchar
-ctypedef unsigned short uint16
+ctypedef enum GraphType:
+    ALL_ELLIPSE
+    ALL_POLYGON
+    RANDOM
 
 
 ctypedef fused Pixel:
@@ -45,8 +48,7 @@ cdef class Graph:
         self,
         unsigned short num,
         Pixel pixel,
-        bint all_ellipse=0,
-        bint all_polygon=0
+        GraphType config
     ):
         cdef vector[Area] areas
         cdef unsigned short n
@@ -67,8 +69,9 @@ cdef class Graph:
                     rand() % ((pixel[1] - pixel[0]) / pixel[2])
                 ) * pixel[2] + pixel[0]
             n_sides = rand() % 8
-            if all_ellipse or (not all_polygon and n_sides < 3):
-                points = array.array('f', [0., 0., 0., 0.])
+            if config == GraphType.ALL_ELLIPSE or (
+                    config == GraphType.RANDOM and n_sides < 3):
+                points = array.array('f', [0.] * 4)
                 self.generator.gen_circle(points.data.as_floats, areas[i])
                 draw.ellipse(points, outline=alpha, fill=alpha)
             else:

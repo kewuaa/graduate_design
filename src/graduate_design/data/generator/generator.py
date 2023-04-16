@@ -18,6 +18,7 @@ class Generator:
         pixel: Union[list, int],
         graph_num: Union[list, int],
         graph_size: Union[list, int],
+        graph_type: int,
         data_path: Path,
     ) -> None:
         self._img_num = img_num
@@ -32,6 +33,7 @@ class Generator:
             else tuple(graph_size)
         )
         self._pixel = pixel if type(pixel) is int else array.array('B', pixel)
+        self._graph_type = graph_type
         self._loop = asyncio.get_event_loop()
         self._img_save_path = data_path / 'imgs'
         self._img_save_path.mkdir(parents=True, exist_ok=True)
@@ -41,7 +43,8 @@ class Generator:
             None,
             self._graph.gen,
             self._get_circle_num(),
-            self._pixel
+            self._pixel,
+            self._graph_type,
         )
         async with aiofiles.open(
             self._img_save_path / f'{index + 1}.png', 'wb'

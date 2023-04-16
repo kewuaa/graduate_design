@@ -6,8 +6,9 @@
 image_num = 100
 image_size = 64
 pixel = [0, 128, 10]
-circle_num = [1, 3]
-circle_size = [6, 16]
+graph_num = [1, 3]
+graph_size = [6, 16]
+graph_type = 2 # 0 -> ALL_ELLIPSE; 1 -> ALL_POLYGON; 2 -> RANDOM
 theta_step = 1.5
 angle = [0, 180]
 
