@@ -56,6 +56,7 @@ class BaseNet(torch.nn.Module):
             if not torch.cuda.is_available():
                 logger.warn('cuda is not available in your computer')
                 device = 'cpu'
+        logger.info(f'device set: {device}')
         self._device = torch.device(device)
         self.to(device)
 
