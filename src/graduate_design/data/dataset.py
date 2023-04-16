@@ -41,8 +41,8 @@ def init() -> int:
     img_num = config_for_data.image_num
     img_size = config_for_data.image_size
     pixel = config_for_data.pixel
-    circle_num = config_for_data.circle_num
-    circle_size = config_for_data.circle_size
+    graph_num = config_for_data.graph_num
+    graph_size = config_for_data.graph_size
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
     add_noise = config_for_data.noise
@@ -51,22 +51,22 @@ def init() -> int:
         img_size    : {img_size}x{img_size}
         img_num     : {img_num}
         pixel       : {pixel}
-        circle_size : {circle_size}
-        circle_num  : {circle_num}
+        graph_size  : {graph_size}
+        graph_num   : {graph_num}
         angle       : {angle}
         theta_step  : {theta_step}
         noise       : {add_noise}
     ''')
     global data_path
-    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{circle_size}_{circle_num}_{angle}_{theta_step}_{"with" if add_noise else "without"}_noise'
+    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{graph_size}_{graph_num}_{angle}_{theta_step}_{"with" if add_noise else "without"}_noise'
     if not data_path.exists():
         logger.info('not find data in path, initialize it...')
         generator = Generator(
             img_num,
             img_size,
             pixel,
-            circle_num,
-            circle_size,
+            graph_num,
+            graph_size,
             data_path,
         )
         transformer = Transformer(

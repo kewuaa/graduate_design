@@ -1,19 +1,9 @@
-import os
 import asyncio
-from distutils import spawn
 from pathlib import Path
 
 import aiofiles
 
-opencv_home = os.environ.get('OPENCV_HOME')
-if opencv_home is None:
-    raise RuntimeError('OpenCV library not find')
-mingw_path = spawn.find_executable('gcc')
-if not mingw_path:
-    raise RuntimeError('stdc lib not find')
-os.add_dll_directory(mingw_path + '/..')
-os.add_dll_directory(opencv_home + '/x64/mingw/bin')
-from ...cylib import ctrans
+from ...cylib import Radon
 
 
 class Transformer:
@@ -31,7 +21,7 @@ class Transformer:
         self._source_path = data_path / 'imgs'
         self._target_path = data_path / 'transformed_imgs'
         self._target_path.mkdir(parents=True, exist_ok=True)
-        self._radon = ctrans.Radon(theta_step, start_angle, end_angle, 1, 1, 1)
+        self._radon = Radon(theta_step, start_angle, end_angle, 1, 1, 1)
 
     async def _transform(self, name, refresh=None):
         img_file = self._source_path / name

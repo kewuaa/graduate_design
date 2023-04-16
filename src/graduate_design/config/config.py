@@ -23,8 +23,8 @@ class DataConfig:
     image_num: int = 10000
     image_size: int = 64
     pixel: Union[tuple, int] = 0
-    circle_num: Union[tuple, int] = 3
-    circle_size: Union[tuple, int] = 10
+    graph_num: Union[tuple, int] = 3
+    graph_size: Union[tuple, int] = 10
     theta_step: float = 0.
     angle: tuple = (0, 180)
     noise: bool = True
