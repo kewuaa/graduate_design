@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <memory>
 #include <random>
 #include "graph.hpp"
 
