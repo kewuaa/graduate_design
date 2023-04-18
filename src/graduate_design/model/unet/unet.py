@@ -103,7 +103,7 @@ class UNet(BaseNet):
             loss_func,
             partial(
                 optim.lr_scheduler.ReduceLROnPlateau,
-                mode='max',
+                mode='min',
                 patience=5
             )
         )
