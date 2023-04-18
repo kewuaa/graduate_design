@@ -3,19 +3,15 @@ from functools import partial
 import cv2
 import torch
 import numpy as np
-from rich.progress import Progress
 from torch import (
     Tensor,
     autocast,
-    cuda,
     inference_mode,
     nn,
     optim,
 )
-from torch.utils.data import DataLoader, random_split
 from torchnet import meter
 
-from ..utils.visdom import Visualizer
 from .base import BaseNet, RegularizeLoss
 
 
@@ -83,137 +79,17 @@ class Automap(BaseNet):
         return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
 
     def start_train(self, device: str = None) -> None:
-        self.set_device(device)
-        device = self._device
-
-        # load config
-        config = self._config
-        epoch_num = config.epoch_num
-        batch_size = config.batch_size
-        validation_percent = config.validation_percent
-        learning_rate = config.learning_rate
-        weight_decay = config.weight_decay
-        alpha = config.alpha
-        amp = config.amp and device.type == 'cuda'
-        self.print_config()
-
-        # 1. Create dataset
-        dataset = self._dataset
-
-        # 2. Split into train / validation partitions
-        length = len(dataset)
-        validate_set_num = int(length * validation_percent)
-        train_set_num = length - validate_set_num
-        train_set, validate_set = random_split(
-            dataset,
-            [train_set_num, validate_set_num]
-        )
-
-        # 3. Create dataloaders
-        train_loader = DataLoader(train_set, batch_size)
-        validate_loader = DataLoader(validate_set, batch_size)
-
-        # 4. Set up the optimizer, the loss, the learning rate scheduler
-        # and the loss scaling for AMP
-        optimizer = optim.RMSprop(
-            self.parameters(),
-            lr=learning_rate,
-            alpha=alpha,
-            weight_decay=weight_decay
-        )
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer,
-            'min',
-            patience=5
-        )
-        grad_scaler = cuda.amp.GradScaler(enabled=amp)
-        loss_func = nn.MSELoss()
-
-        # 指标
-        loss_meter = meter.AverageValueMeter()
-
-        visualizer = Visualizer()
-        progress = Progress()
-        load_task = progress.add_task(
-            '[red]load image',
-            start=False
-        )
-        dataset.add_refresh(partial(
-            progress.update,
-            load_task,
-            advance=1
-        ))
-        with progress, dataset:
-            progress.update(load_task, total=length)
-            progress.start_task(load_task)
-            epoch_task = progress.add_task(
-                '[blue]train epoch progress',
-                total=epoch_num,
+        mse_loss = nn.MSELoss()
+        def loss_func(input, target):
+            return mse_loss(input, target) + self.regularize_loss()
+        super().start_train(
+            loss_func,
+            partial(
+                optim.lr_scheduler.ReduceLROnPlateau,
+                mode='min',
+                patience=5
             )
-            train_task = progress.add_task(
-                '',
-                total=train_set_num
-            )
-            evaluate_task = progress.add_task(
-                '',
-                total=validate_set_num,
-                visible=False
-            )
-
-            division_step = train_set_num // (5 * batch_size)
-            global_step = 0
-            self.train()
-            for epoch in range(1, epoch_num + 1):
-                progress.reset(train_task)
-                progress.update(
-                    train_task,
-                    description=f'[yellow]train epoch {epoch}'
-                )
-
-                loss_meter.reset()
-                for step, batch in enumerate(train_loader):
-                    image, label = batch
-                    size = image.size(0)
-                    image = image.to(device=device)
-                    label = label.to(device=device)
-
-                    with autocast(device.type, enabled=amp):
-                        pre = self(image)
-                        loss = loss_func(pre, label) + self.regularize_loss()
-                    loss_value = loss.item()
-                    loss_meter.add(loss_value)
-                    optimizer.zero_grad()
-                    grad_scaler.scale(loss).backward()
-                    grad_scaler.step(optimizer)
-                    grad_scaler.update()
-                    global_step += 1
-
-                    progress.update(train_task, advance=size)
-                    visualizer.plot(step, loss_value, f'epoch {epoch}')
-
-                    if division_step and global_step % division_step == 0:
-                        progress.update(
-                            evaluate_task,
-                            description=f'validation of epoch {epoch}',
-                            visible=True
-                        )
-                        evaluate_loss = self.evaluate(
-                            validate_loader,
-                            device,
-                            amp,
-                            refresh=partial(progress.update, evaluate_task)
-                        )
-                        visualizer.log(f'evaluate loss: {evaluate_loss}')
-                        scheduler.step(evaluate_loss)
-                        progress.update(evaluate_task, visible=False)
-                progress.update(epoch_task, advance=1)
-                average_loss, std_loss = loss_meter.value()
-
-                visualizer.log(f'''
-                    epoch {epoch}:<br>
-                    ----train loss    : {average_loss}
-                ''')
-                self.save(suffix=f'epoch{epoch}')
+        )
 
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):

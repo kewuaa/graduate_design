@@ -37,7 +37,8 @@ class ModelConfig:
     weight_decay: float = 1e-8
     optimizer: str = 'rms'
     momentum: float = 1.
-    betas: tuple = (0.9, 0.9)
+    alpha: float = 0.9
+    betas: tuple = (0.9, 0.99)
     nesterov: bool = True
     gradient_clipping: float = 1.
     amp: bool = True
@@ -45,7 +46,7 @@ class ModelConfig:
 
 @dataclass(order=False, eq=False)
 class AutomapConfig(ModelConfig):
-    alpha: float = 0.9
+    pass
 
 
 @dataclass(order=False, eq=False)
