@@ -1,41 +1,14 @@
 ---@diagnostic disable: undefined-global
-local lib_type = 'static'
-local opencv_home = string.format('%s/%s', os.getenv('OPENCV_HOME'), lib_type)
-local opencv_include_dir = opencv_home .. '/include'
-local opencv_link_dir = opencv_home .. '/x64/mingw/lib'
 add_rules("mode.debug", "mode.release")
 
 target("cpp")
     set_kind("binary")
-    add_files("src/main.cpp")
-    add_files("src/radon_transform.cpp")
-    add_files("src/graph.cpp")
+    add_files("src/*.cpp")
     add_includedirs('./include')
+    add_includedirs(os.getenv('INCLUDE'))
+    add_linkdirs(os.getenv('LIB'))
     -- opencv
-    add_includedirs(opencv_include_dir)
-    add_linkdirs(opencv_link_dir)
-    add_links('opencv_world470')
-    if lib_type == 'static' then
-        add_linkdirs([[D:\Softwares\Program_Files\C\mingw64\x86_64-w64-mingw32\lib]])
-        add_links(
-            'gdi32',
-            'ComDlg32',
-            'OleAut32',
-            'Ole32',
-            'uuid',
-            'libpng',
-            'libopenjp2',
-            'ade',
-            'IlmImf',
-            'libjpeg-turbo',
-            'libprotobuf',
-            'libtiff',
-            'libwebp',
-            'quirc',
-            'zlib',
-            'opencv_img_hash470'
-        )
-    end
+    add_links('opencv_world460')
 
 --
 -- If you want to known more usage about xmake, please see https://xmake.io

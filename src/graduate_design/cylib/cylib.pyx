@@ -3,6 +3,8 @@
 # cython: wraparound=False
 # cython: cdivision=True
 # distutils: language=c++
+# distutils: include_dirs=src/graduate_design/cylib/cpp/include
+# distutils: sources=src/graduate_design/cylib/cpp/src/graph.cpp src/graduate_design/cylib/cpp/src/radon_transform.cpp
 from io import BytesIO
 from PIL import Image, ImageDraw
 

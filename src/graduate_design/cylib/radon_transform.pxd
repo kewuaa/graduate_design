@@ -1,10 +1,6 @@
 from libcpp.vector cimport vector
 
 
-cdef extern from "./cpp/src/radon_transform.cpp" nogil:
-    pass
-
-
 cdef extern from "radon_transform.hpp" namespace "algorithm" nogil:
     cdef cppclass RadonTransformer:
         RadonTransformer() except +

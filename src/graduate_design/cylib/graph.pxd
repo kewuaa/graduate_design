@@ -1,5 +1,3 @@
-cdef extern from "./cpp/src/graph.cpp" nogil:
-    pass
 
 
 cdef extern from "graph.hpp" namespace "graph" nogil:

@@ -74,7 +74,11 @@ namespace graph {
         uint16_t n_sides
     )
     {
-        std::random_shuffle(available_angles, available_angles + 24);
+        std::shuffle(
+            available_angles,
+            available_angles + 24,
+            std::default_random_engine(seed())
+        );
         std::sort(
             available_angles,
             available_angles + n_sides,
