@@ -1,4 +1,4 @@
-from distutils.msvccompiler import MSVCCompiler
+from distutils.unixccompiler import UnixCCompiler
 import os
 
 from setuptools import setup, Extension
