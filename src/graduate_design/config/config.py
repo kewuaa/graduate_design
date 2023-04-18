@@ -3,17 +3,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 try:
-    import tomllib
-    def read_toml(path: str) -> dict:
-        with open(path, 'rb') as f:
-            content = tomllib.load(f)
-        return content
+    import tomllib as toml
 except ImportError:
-    import rtoml
-    def read_toml(path: str) -> dict:
-        with open(path) as f:
-            content = rtoml.load(f)
-        return content
+    import tomli as toml
 config_file = Path('./config.toml')
 __config = {}
 
@@ -66,7 +58,8 @@ class UnetConfig(ModelConfig):
 def init():
     global __config
     if config_file.exists():
-        config = read_toml(config_file)
+        with open(config_file, 'rb') as f:
+            config = toml.load(f)
     data = DataConfig(**config.get('data', {}))
     automap = AutomapConfig(**config.get('automap', {}))
     unet = UnetConfig(**config.get('unet', {}))
