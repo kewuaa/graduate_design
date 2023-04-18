@@ -46,7 +46,9 @@ class ModelConfig:
 
 @dataclass(order=False, eq=False)
 class AutomapConfig(ModelConfig):
-    pass
+    weight_decay:float = 0.
+    momentum: float = 0.
+    gradient_clipping: float = 0.
 
 
 @dataclass(order=False, eq=False)
