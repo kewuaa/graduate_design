@@ -1,3 +1,4 @@
+from distutils.msvccompiler import MSVCCompiler
 import os
 
 from setuptools import setup, Extension
@@ -6,14 +7,15 @@ from setuptools.command.build_ext import build_ext
 
 class Build(build_ext):
     def build_extensions(self):
-        if 'zig' in self.compiler.cc:
-            self.compiler.dll_libraries = []
-            self.compiler.set_executable(
-                'compiler_so',
-                f'{self.compiler.cc} -O -Wall -lc++'
-            )
-            for ext in self.extensions:
-                ext.undef_macros = ['_DEBUG']
+        if not isinstance(self.compiler, MSVCCompiler):
+            if 'zig' in self.compiler.cc:
+                self.compiler.dll_libraries = []
+                self.compiler.set_executable(
+                    'compiler_so',
+                    f'{self.compiler.cc} -O -Wall -lc++'
+                )
+                for ext in self.extensions:
+                    ext.undef_macros = ['_DEBUG']
         super().build_extensions()
 
 
