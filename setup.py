@@ -7,7 +7,7 @@ from setuptools.command.build_ext import build_ext
 
 class Build(build_ext):
     def build_extensions(self):
-        if not isinstance(self.compiler, MSVCCompiler):
+        if isinstance(self.compiler, UnixCCompiler):
             if 'zig' in self.compiler.cc:
                 self.compiler.dll_libraries = []
                 self.compiler.set_executable(
