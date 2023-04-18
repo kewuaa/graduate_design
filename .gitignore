@@ -6,3 +6,4 @@ release/
 __pycache__/
 build/
 *.pyd
+*.html
