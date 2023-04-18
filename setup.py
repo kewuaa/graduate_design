@@ -12,6 +12,8 @@ class Build(build_ext):
                 'compiler_so',
                 f'{self.compiler.cc} -O -Wall -lc++'
             )
+            for ext in self.extensions:
+                ext.undef_macros = ['_DEBUG']
         super().build_extensions()
 
 
@@ -29,7 +31,6 @@ exts = [
         include_dirs=include_dirs,
         library_dirs=library_dirs,
         libraries=libraries,
-        undef_macros=['_DEBUG']
     ),
 ]
 if suffix == 'pyx':
