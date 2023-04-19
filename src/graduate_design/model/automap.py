@@ -13,6 +13,7 @@ from torch import (
 from torchnet import meter
 
 from .base import BaseNet, RegularizeLoss
+from .unet.losses import NormalLoss
 
 
 class Automap(BaseNet):
@@ -74,14 +75,22 @@ class Automap(BaseNet):
         img, label = data
         img = cv2.resize(img, self._new_img_size, None, 0, 0, cv2.INTER_CUBIC)
         label = cv2.resize(label, self._new_label_size, None, 0, 0, cv2.INTER_NEAREST)
-        img = cv2.normalize(img, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-        label = cv2.normalize(label, None, -0.5, 0.5, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-        return np.expand_dims(img, axis=0), np.expand_dims(label, axis=0)
+        img = cv2.normalize(img, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        label = cv2.normalize(label, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+        return np.expand_dims(img, axis=0), label.astype(np.int64)
 
     def start_train(self, device: str = None) -> None:
-        mse_loss = nn.MSELoss()
-        def loss_func(input, target):
-            return mse_loss(input, target) + self.regularize_loss()
+        loss_type = self._config.loss
+        if loss_type == 'mse':
+            mse_loss = nn.MSELoss()
+            def loss_func(input, target):
+                return mse_loss(input, target) + self.regularize_loss()
+        elif loss_type == 'dice':
+            dice_loss = NormalLoss(1)
+            def loss_func(input, target):
+                return dice_loss(input, target)
+        else:
+            raise RuntimeError(f'bad config: invalid loss type: {loss_type}')
         super().start_train(
             loss_func,
             partial(
@@ -130,4 +139,4 @@ class Automap(BaseNet):
         pre = self(img)
         pre = pre.cpu().squeeze().numpy()
         pre = cv2.resize(pre, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
-        return np.where(pre > 0, 0.5, -0.5)
+        return pre > 0.5
