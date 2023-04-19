@@ -15,6 +15,7 @@ from torchnet import meter
 
 from .base import BaseNet, RegularizeLoss
 from .unet.losses import NormalLoss
+from ..utils.dice import dice_coeff
 
 
 class Automap(BaseNet):
@@ -78,7 +79,7 @@ class Automap(BaseNet):
         label = cv2.resize(label, self._new_label_size, None, 0, 0, cv2.INTER_NEAREST)
         img = cv2.normalize(img, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
         label = cv2.normalize(label, None, 0, 1, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
-        return np.expand_dims(img, axis=0), label.astype(np.int64)
+        return np.expand_dims(img, axis=0), label
 
     def start_train(self, device: str = None) -> None:
         loss_type = self._config.loss
@@ -104,20 +105,31 @@ class Automap(BaseNet):
     @inference_mode()
     def evaluate(self, dataloader, device, amp, refresh):
         self.eval()
-        loss_meter = meter.AverageValueMeter()
-        for step, batch in enumerate(dataloader):
+        # loss_meter = meter.AverageValueMeter()
+        # for step, batch in enumerate(dataloader):
+        #     image, label = batch
+        #     image = image.to(device=device, memory_format=channels_last)
+        #     label = label.to(device=device)
+
+        #     with autocast(device.type, enabled=amp):
+        #         pre = self(image).squeeze(1)
+        #         loss = nn.functional.mse_loss(pre, label.squeeze(1))
+        #     loss_meter.add(loss.item())
+        #     refresh(advance=image.size(0))
+        # average_loss, std_loss = loss_meter.value()
+        dice_score = 0
+        num_val_batches = len(dataloader)
+        for batch in dataloader:
             image, label = batch
             image = image.to(device=device, memory_format=channels_last)
             label = label.to(device=device)
-
             with autocast(device.type, enabled=amp):
                 pre = self(image).squeeze(1)
-                loss = nn.functional.mse_loss(pre, label.squeeze(1))
-            loss_meter.add(loss.item())
+                pre = torch.where(pre > 0.5, 1, 0)
+                dice_score += dice_coeff(pre, label)
             refresh(advance=image.size(0))
-        average_loss, std_loss = loss_meter.value()
         self.train()
-        return average_loss
+        return 1 - dice_score / max(num_val_batches, 1)
 
     def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)
