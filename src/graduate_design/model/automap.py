@@ -129,4 +129,5 @@ class Automap(BaseNet):
         img.to(self._device)
         pre = self(img)
         pre = pre.cpu().squeeze().numpy()
-        return cv2.resize(pre, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
+        pre = cv2.resize(pre, self._origin_label_size, None, 0, 0, cv2.INTER_NEAREST)
+        return np.where(pre > 0, 0.5, -0.5)

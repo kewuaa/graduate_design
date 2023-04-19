@@ -141,18 +141,12 @@ class Dataset(Dataset):
 
     async def _load_one(self, index: int):
         name = f'{index}.png'
-        img = await self._loop.run_in_executor(
-            None,
-            cv2.imread,
-            str(self._img_dir / name),
-            cv2.IMREAD_GRAYSCALE
-        )
-        label = await self._loop.run_in_executor(
-            None,
-            cv2.imread,
-            str(self._label_dir / name),
-            cv2.IMREAD_GRAYSCALE
-        )
+        async with aiofiles.open(self._img_dir / name, 'rb') as f:
+            img_data = await f.read()
+        img = cv2.imdecode(img_data, cv2.IMREAD_GRAYSCALE)
+        async with aiofiles.open(self._label_dir / name, 'rb') as f:
+            label_data = await f.read()
+        label = cv2.imdecode(label_data, cv2.IMREAD_GRAYSCALE)
         img, label = self._pre_process((img, label))
         if callable(self._refresh):
             self._refresh()
