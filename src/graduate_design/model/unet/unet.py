@@ -13,7 +13,7 @@ from torch import (
 )
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
-from . import losses
+from .. import losses
 
 
 class UNet(BaseNet):

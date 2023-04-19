@@ -11,10 +11,8 @@ from torch import (
     nn,
     optim,
 )
-from torchnet import meter
 
 from .base import BaseNet, RegularizeLoss
-from .unet.losses import NormalLoss
 from ..utils.dice import dice_coeff
 
 
