@@ -186,7 +186,7 @@ class BaseNet(torch.nn.Module):
 
                     with autocast(device.type, enabled=amp):
                         pre = self(image).squeeze(1)
-                        loss = loss_func(pre, label.squeeze(1))
+                        loss = loss_func(pre, label)
                     loss_value = loss.item()
                     loss_meter.add(loss_value)
                     optimizer.zero_grad(set_to_none=True)
