@@ -5,6 +5,7 @@ from functools import lru_cache, partial
 from pathlib import Path
 
 import cv2
+import aiofiles
 import numpy as np
 from rich.progress import Progress
 from torch import Tensor
@@ -143,10 +144,10 @@ class Dataset(Dataset):
         name = f'{index}.png'
         async with aiofiles.open(self._img_dir / name, 'rb') as f:
             img_data = await f.read()
-        img = cv2.imdecode(img_data, cv2.IMREAD_GRAYSCALE)
+        img = cv2.imdecode(np.asarray(bytearray(img_data)), cv2.IMREAD_GRAYSCALE)
         async with aiofiles.open(self._label_dir / name, 'rb') as f:
             label_data = await f.read()
-        label = cv2.imdecode(label_data, cv2.IMREAD_GRAYSCALE)
+        label = cv2.imdecode(np.asarray(bytearray(label_data)), cv2.IMREAD_GRAYSCALE)
         img, label = self._pre_process((img, label))
         if callable(self._refresh):
             self._refresh()
