@@ -9,21 +9,13 @@ namespace graph {
     Generator::Generator() {};
 
     Generator::Generator(uint16_t img_size, uint16_t radius):
-        engine(seed()), img_size(img_size), solid_radius(true), radius(radius)
-    {
-        for (uint16_t i = 0; i < 24; i++) {
-            available_angles[i] = i * 15;
-        }
-    }
+        engine(seed()), img_size(img_size), solid_radius(true), radius(radius) {}
 
     Generator::Generator(uint16_t img_size, uint16_t min_radius, uint16_t max_radius):
         engine(seed()), img_size(img_size), solid_radius(false)
     {
         radius_range[0] = min_radius;
         radius_range[1] = max_radius;
-        for (uint16_t i = 0; i < 24; i++) {
-            available_angles[i] = i * 15;
-        }
     }
 
     uint16_t Generator::get_radius()
@@ -74,9 +66,13 @@ namespace graph {
         uint16_t n_sides
     )
     {
+        static float available_angles[8] = {
+            0., PI / 8, PI / 4, PI / 8 * 3, PI / 2,
+            PI / 8 * 5, PI / 4 * 3, PI / 8 * 7
+        };
         std::shuffle(
             available_angles,
-            available_angles + 24,
+            available_angles + 8,
             std::default_random_engine(seed())
         );
         std::sort(
@@ -87,9 +83,9 @@ namespace graph {
         for (uint16_t i = 0; i < n_sides; i++) {
             uint16_t j = 2 * i;
             points[j] = area.center[0] +
-                std::cos(available_angles[i] * PI / 180) * area.radius;
+                std::cos(available_angles[i]) * area.radius;
             points[j + 1] = area.center[1] +
-                std::sin(available_angles[i] * PI / 180) * area.radius;
+                std::sin(available_angles[i]) * area.radius;
         }
     }
 

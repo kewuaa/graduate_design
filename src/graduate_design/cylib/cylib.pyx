@@ -70,28 +70,26 @@ cdef class Graph:
                 alpha = (
                     rand() % ((pixel[1] - pixel[0]) / pixel[2])
                 ) * pixel[2] + pixel[0]
-            n_sides = rand() % 8
             if config == GraphType.ALL_ELLIPSE or (
-                    config == GraphType.RANDOM and n_sides < 3):
+                    config == GraphType.RANDOM and rand() % 3 == 0):
                 points = array.array('f', [0.] * 4)
                 self.generator.gen_circle(points.data.as_floats, areas[i])
                 draw.ellipse(points, outline=alpha, fill=alpha)
             else:
-                if n_sides < 3:
-                    n_sides = rand() % 5 + 3
-                if rand() % 2:
-                    draw.regular_polygon(
-                        (areas[i].center, areas[i].radius), n_sides,
-                        rotation=rand() % 360, fill=alpha, outline=alpha,
-                    )
-                else:
-                    points = array.array('f', [0.] * n_sides * 2)
-                    self.generator.gen_polygon(
-                        points.data.as_floats,
-                        areas[i],
-                        n_sides
-                    )
-                    draw.polygon(points, outline=alpha, fill=alpha)
+                n_sides = rand() % 3 + 3
+                # if rand() % 2:
+                draw.regular_polygon(
+                    (areas[i].center, areas[i].radius), n_sides,
+                    rotation=rand() % 360, fill=alpha, outline=alpha,
+                )
+                # else:
+                #     points = array.array('f', [0.] * n_sides * 2)
+                #     self.generator.gen_polygon(
+                #         points.data.as_floats,
+                #         areas[i],
+                #         n_sides
+                #     )
+                #     draw.polygon(points, outline=alpha, fill=alpha)
         img_bytes = BytesIO()
         img.save(img_bytes, format='PNG')
         return img_bytes.getvalue()

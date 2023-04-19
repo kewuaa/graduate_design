@@ -16,7 +16,6 @@ namespace graph {
             std::default_random_engine engine;
             uint16_t img_size;
             bool solid_radius;
-            uint16_t available_angles[24];
             union {
                 uint16_t radius; uint16_t radius_range[2];
             };
