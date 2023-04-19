@@ -98,7 +98,7 @@ class Automap(BaseNet):
             loss_func,
             partial(
                 optim.lr_scheduler.ReduceLROnPlateau,
-                mode='min',
+                mode='max',
                 patience=5
             )
         )
@@ -130,7 +130,7 @@ class Automap(BaseNet):
                 dice_score += dice_coeff(pre, label)
             refresh(advance=image.size(0))
         self.train()
-        return 1 - dice_score / max(num_val_batches, 1)
+        return dice_score / max(num_val_batches, 1)
 
     def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)

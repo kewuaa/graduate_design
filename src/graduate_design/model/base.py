@@ -218,7 +218,7 @@ class BaseNet(torch.nn.Module):
                         if scheduler:
                             scheduler.step(val_score)
                         progress.update(evaluate_task, visible=False)
-                        visualizer.log(f'Validation loss: {val_score}')
+                        visualizer.log(f'Validation Dice score: {val_score}')
                 progress.update(epoch_task, advance=1)
                 average_loss, std_loss = loss_meter.value()
 
