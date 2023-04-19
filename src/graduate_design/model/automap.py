@@ -88,9 +88,9 @@ class Automap(BaseNet):
             def loss_func(input, target):
                 return mse_loss(input, target) + self.regularize_loss()
         elif loss_type == 'dice':
-            dice_loss = NormalLoss(1)
             def loss_func(input, target):
-                return dice_loss(input, target)
+                loss = dice_coeff(torch.where(input > 0.5, 1, 0), target)
+                return 1 - loss
         else:
             raise RuntimeError(f'bad config: invalid loss type: {loss_type}')
         super().start_train(
