@@ -49,14 +49,12 @@ class AutomapConfig(ModelConfig):
     weight_decay:float = 0.
     momentum: float = 0.
     gradient_clipping: float = 0.
-    loss: str = 'mse'
 
 
 @dataclass(order=False, eq=False)
 class UnetConfig(ModelConfig):
     n_classes: int = 0
     unique_values: tuple = None
-    loss: str = 'normal'
 
 
 def init():

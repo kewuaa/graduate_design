@@ -1,1 +1,1 @@
-from .losses import NormalLoss, LovaszLoss, dice_coeff
+from .losses import LovaszLoss, DiceLoss

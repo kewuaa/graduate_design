@@ -14,6 +14,7 @@ from torch import (
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
 from .. import losses
+from ...utils.dice import dice_coeff
 
 
 class UNet(BaseNet):
@@ -92,18 +93,22 @@ class UNet(BaseNet):
         torch.save(state_dict, path)
 
     def start_train(self, device: str = None):
-        loss_type = self._config.loss
-        if loss_type == 'normal':
-            loss_func = losses.NormalLoss(self.n_classes)
-        elif loss_type == 'lovasz':
-            loss_func = losses.LovaszLoss(self.n_classes)
+        if self.n_classes > 1:
+            dice_loss = losses.DiceLoss(1)
+            addi_loss = nn.CrossEntropyLoss()
         else:
-            raise RuntimeError(f'bad config: invalid loss type: {loss_type}')
+            dice_loss = losses.DiceLoss(0)
+            addi_loss = nn.BCEWithLogitsLoss()
+
+        def loss_func(input, target):
+            loss = dice_loss(input, target) + \
+                addi_loss(input, target)
+            return loss
         super().start_train(
             loss_func,
             partial(
                 optim.lr_scheduler.ReduceLROnPlateau,
-                mode='min',
+                mode='max',
                 patience=5
             )
         )
@@ -129,7 +134,7 @@ class UNet(BaseNet):
                 if self.n_classes == 1:
                     pre = (torch.sigmoid(pre.squeeze(1)) > 0.5).float()
                     # compute the Dice score
-                    dice_score += losses.dice_coeff(
+                    dice_score += dice_coeff(
                         pre,
                         label,
                     )
@@ -139,13 +144,13 @@ class UNet(BaseNet):
                         self.n_classes
                     ).permute(0, 3, 1, 2).float()
                     # compute the Dice score, ignoring background
-                    dice_score += losses.dice_coeff(
+                    dice_score += dice_coeff(
                         pre[:, 1:].flatten(0, 1),
                         label[:, 1:].flatten(0, 1),
                     )
             refresh(advance=image.size(0))
         self.train()
-        return dice_score / max(num_val_batches, 1)
+        return dice_score / num_val_batches
 
     def validate(self, index: int = None):
         img, label = self._dataset.load_one(index)
