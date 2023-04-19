@@ -6,6 +6,7 @@ import numpy as np
 from torch import (
     Tensor,
     autocast,
+    channels_last,
     inference_mode,
     nn,
     optim,
@@ -106,12 +107,12 @@ class Automap(BaseNet):
         loss_meter = meter.AverageValueMeter()
         for step, batch in enumerate(dataloader):
             image, label = batch
-            image = image.to(device=device)
+            image = image.to(device=device, memory_format=channels_last)
             label = label.to(device=device)
 
             with autocast(device.type, enabled=amp):
-                pre = self(image)
-                loss = nn.functional.mse_loss(pre, label)
+                pre = self(image).squeeze(1)
+                loss = nn.functional.mse_loss(pre, label.squeeze(1))
             loss_meter.add(loss.item())
             refresh(advance=image.size(0))
         average_loss, std_loss = loss_meter.value()
