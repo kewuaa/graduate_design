@@ -49,13 +49,13 @@ namespace graph {
         } else {
             _radius = get_radius();
         }
-        std::uniform_real_distribution<float> pos_dist(radius, img_size - radius);
+        std::uniform_real_distribution<float> pos_dist(_radius, img_size - _radius);
         float x = pos_dist(engine), y = pos_dist(engine);
         while (!in_circle(x, y, _radius)) {
             x = pos_dist(engine);
             y = pos_dist(engine);
         }
-        area.radius = radius;
+        area.radius = _radius;
         area.center[0] = x;
         area.center[1] = y;
     }

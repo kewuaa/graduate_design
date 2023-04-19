@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 
 from . import lovasz_losses
-from ....utils.dice import dice_coeff
+from ...utils.dice import dice_coeff
 
 
 class LovaszLoss(nn.Module):
