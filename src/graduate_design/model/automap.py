@@ -83,9 +83,15 @@ class Automap(BaseNet):
     def start_train(self, device: str = None) -> None:
         mse_loss = nn.MSELoss()
         dice_loss = DiceLoss()
+        loss_value = 1.
         def loss_func(input, target):
+            nonlocal loss_value
             input = torch.sigmoid(input)
-            loss = dice_loss(input, target) + mse_loss(input, target)
+            _dice_loss = dice_loss(input, target)
+            loss_value = _dice_loss.item()
+            percent = 0.7 if loss_value < 0.8 else 0.3
+            loss = _dice_loss * percent + \
+                (mse_loss(input, target) + self.regularize_loss()) * (1 - percent)
             return loss
         super().start_train(
             loss_func,
