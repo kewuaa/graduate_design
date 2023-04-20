@@ -17,7 +17,7 @@ class DataConfig:
     pixel: Union[tuple, int] = 0
     graph_num: Union[tuple, int] = 3
     graph_size: Union[tuple, int] = 10
-    graph_type: int = 2 # 0 -> ALL_ELLIPSE; 1 -> ALL_POLYGON; 2 -> RANDOM
+    graph_type: Union[tuple, int] = 0
     theta_step: float = 0.
     angle: tuple = (0, 180)
     noise: bool = True

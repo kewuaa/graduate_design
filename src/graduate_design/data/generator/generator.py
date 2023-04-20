@@ -33,7 +33,8 @@ class Generator:
             else tuple(graph_size)
         )
         self._pixel = pixel if type(pixel) is int else array.array('B', pixel)
-        self._graph_type = graph_type
+        self._graph_type = graph_type \
+            if type(graph_type) is int else tuple(graph_type)
         self._loop = asyncio.get_event_loop()
         self._img_save_path = data_path / 'imgs'
         self._img_save_path.mkdir(parents=True, exist_ok=True)

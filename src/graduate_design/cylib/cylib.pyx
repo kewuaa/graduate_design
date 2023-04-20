@@ -18,10 +18,12 @@ from .radon_transform cimport RadonTransformer
 
 
 ctypedef unsigned char uchar
-ctypedef enum GraphType:
-    ALL_ELLIPSE
-    ALL_POLYGON
-    RANDOM
+ctypedef unsigned short uint16
+
+
+ctypedef fused GraphType:
+    uint16
+    tuple
 
 
 ctypedef fused Pixel:
@@ -32,11 +34,11 @@ ctypedef fused Pixel:
 cdef class Graph:
 
     cdef Generator generator
-    cdef unsigned short img_size
+    cdef uint16 img_size
 
     def __init__(
         self,
-        unsigned short img_size,
+        uint16 img_size,
         tuple radius
     ):
         self.img_size = img_size
@@ -48,19 +50,18 @@ cdef class Graph:
 
     cpdef bytes gen(
         self,
-        unsigned short num,
+        uint16 num,
         Pixel pixel,
-        GraphType config
+        GraphType graph_types
     ):
         cdef vector[Area] areas
-        cdef unsigned short n
+        cdef uint16 n
         with nogil:
             areas.reserve(num)
             n = self.generator.gen(num, areas.data())
         cdef uchar alpha
+        cdef uint16 i, _type
         cdef array.array points
-        cdef unsigned short i
-        cdef unsigned short n_sides
         img = Image.new('L', (self.img_size, self.img_size), 0)
         draw = ImageDraw.Draw(img)
         for i in range(n):
@@ -70,26 +71,29 @@ cdef class Graph:
                 alpha = (
                     rand() % ((pixel[1] - pixel[0]) / pixel[2])
                 ) * pixel[2] + pixel[0]
-            if config == GraphType.ALL_ELLIPSE or (
-                    config == GraphType.RANDOM and rand() % 3 == 0):
+            if GraphType is uint16:
+                _type = graph_types
+            else:
+                _type = graph_types[rand() % len(graph_types)]
+
+            if _type < 3:
                 points = array.array('f', [0.] * 4)
                 self.generator.gen_circle(points.data.as_floats, areas[i])
                 draw.ellipse(points, outline=alpha, fill=alpha)
+            elif _type > 100:
+                points = array.array('f', [0.] * 4)
+                self.generator.gen_circle(points.data.as_floats, areas[i])
+                draw.ellipse(
+                    points,
+                    fill=None,
+                    outline=alpha,
+                    width=_type - 100
+                )
             else:
-                n_sides = rand() % 3 + 3
-                # if rand() % 2:
                 draw.regular_polygon(
-                    (areas[i].center, areas[i].radius), n_sides,
+                    (areas[i].center, areas[i].radius), _type,
                     rotation=rand() % 360, fill=alpha, outline=alpha,
                 )
-                # else:
-                #     points = array.array('f', [0.] * n_sides * 2)
-                #     self.generator.gen_polygon(
-                #         points.data.as_floats,
-                #         areas[i],
-                #         n_sides
-                #     )
-                #     draw.polygon(points, outline=alpha, fill=alpha)
         img_bytes = BytesIO()
         img.save(img_bytes, format='PNG')
         return img_bytes.getvalue()
