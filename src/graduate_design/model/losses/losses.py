@@ -48,8 +48,6 @@ class BoundaryLoss(nn.Module):
         device = target.device
         target = onehot2dist(target.cpu().float())
         target = target.to(device)
-        pc = input[:, 1:, ...].float()
-        dc = target[:, 1:, ...].float()
-        multiplied = pc * dc
+        multiplied = input.float() * target.float()
         loss = multiplied.mean()
         return loss

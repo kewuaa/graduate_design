@@ -100,13 +100,13 @@ class UNet(BaseNet):
         else:
             dice_loss = losses.DiceLoss(0)
             addi_loss = nn.BCEWithLogitsLoss()
-        loss_value = 1.
+
+        # def loss_func(input, target):
+        #     return dice_loss(input, target) + addi_loss(input, target)
 
         def loss_func(input, target):
-            nonlocal loss_value
             _dice_loss = dice_loss(input, target)
-            loss_value = _dice_loss.item()
-            percent = 0.7 if loss_value > 0.3 else 0.3
+            percent = _dice_loss.item()
             loss = (_dice_loss + addi_loss(input, target)) * percent + \
                 boundary_loss(input, target) * (1 - percent)
             return loss
