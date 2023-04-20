@@ -1,1 +1,1 @@
-from .losses import LovaszLoss, DiceLoss
+from .losses import LovaszLoss, DiceLoss, BoundaryLoss

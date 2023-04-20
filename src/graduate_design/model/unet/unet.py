@@ -14,7 +14,7 @@ from torch import (
 from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
 from .. import losses
-from ...utils.dice import dice_coeff
+from ...utils.toolfunc import dice_coeff
 
 
 class UNet(BaseNet):
@@ -93,16 +93,22 @@ class UNet(BaseNet):
         torch.save(state_dict, path)
 
     def start_train(self, device: str = None):
+        boundary_loss = losses.BoundaryLoss()
         if self.n_classes > 1:
             dice_loss = losses.DiceLoss(1)
             addi_loss = nn.CrossEntropyLoss()
         else:
             dice_loss = losses.DiceLoss(0)
             addi_loss = nn.BCEWithLogitsLoss()
+        loss_value = 1.
 
         def loss_func(input, target):
-            loss = dice_loss(input, target) + \
-                addi_loss(input, target)
+            nonlocal loss_value
+            _dice_loss = dice_loss(input, target)
+            loss_value = _dice_loss.item()
+            percent = 0.7 if loss_value > 0.3 else 0.3
+            loss = dice_loss(input, target) * percent + \
+                boundary_loss(input, target) * (1 - percent)
             return loss
         super().start_train(
             loss_func,

@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 
 from . import lovasz_losses
-from ...utils.dice import dice_coeff
+from ...utils.toolfunc import dice_coeff, onehot2dist
 
 
 class LovaszLoss(nn.Module):
@@ -40,4 +40,14 @@ class DiceLoss(nn.Module):
             target,
             reduce_batch_first=True
         )
+        return loss
+
+
+class BoundaryLoss(nn.Module):
+    def forward(self, input, target):
+        target = onehot2dist(target.float())
+        pc = input[:, 1:, ...].float()
+        dc = target[:, 1:, ...].float()
+        multiplied = pc * dc
+        loss = multiplied.mean()
         return loss

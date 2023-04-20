@@ -14,7 +14,7 @@ from torch import (
 
 from .base import BaseNet, RegularizeLoss
 from .losses import DiceLoss
-from ..utils.dice import dice_coeff
+from ..utils.toolfunc import dice_coeff
 
 
 class Automap(BaseNet):
@@ -84,12 +84,13 @@ class Automap(BaseNet):
         mse_loss = nn.MSELoss()
         dice_loss = DiceLoss()
         loss_value = 1.
+
         def loss_func(input, target):
             nonlocal loss_value
             input = torch.sigmoid(input)
             _dice_loss = dice_loss(input, target)
             loss_value = _dice_loss.item()
-            percent = 0.7 if loss_value < 0.8 else 0.3
+            percent = 0.7 if loss_value > 0.3 else 0.3
             loss = _dice_loss * percent + \
                 (mse_loss(input, target) + self.regularize_loss()) * (1 - percent)
             return loss
