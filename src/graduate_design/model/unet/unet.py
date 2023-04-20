@@ -107,7 +107,7 @@ class UNet(BaseNet):
             _dice_loss = dice_loss(input, target)
             loss_value = _dice_loss.item()
             percent = 0.7 if loss_value > 0.3 else 0.3
-            loss = dice_loss(input, target) * percent + \
+            loss = _dice_loss * percent + \
                 boundary_loss(input, target) * (1 - percent)
             return loss
         super().start_train(
