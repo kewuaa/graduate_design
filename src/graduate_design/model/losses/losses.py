@@ -45,7 +45,9 @@ class DiceLoss(nn.Module):
 
 class BoundaryLoss(nn.Module):
     def forward(self, input, target):
-        target = onehot2dist(target.float())
+        device = target.device
+        target = onehot2dist(target.cpu().float())
+        target = target.to(device)
         pc = input[:, 1:, ...].float()
         dc = target[:, 1:, ...].float()
         multiplied = pc * dc
