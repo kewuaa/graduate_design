@@ -61,7 +61,9 @@ def init() -> int:
         noise       : {add_noise}
     ''')
     global data_path
-    data_path = data_path / f'{img_size}x{img_size}_{img_num}_{pixel}_{graph_size}_{graph_num}_{graph_type}_{angle}_{theta_step}_{"with" if add_noise else "without"}_noise'
+    data_path = data_path / \
+        f'{img_size}x{img_size}_{img_num}_{pixel}_{graph_size}_{graph_num}' \
+        f'_{graph_type}_{angle}_{theta_step}_{"_noise" if add_noise else ""}'
     if not data_path.exists():
         logger.info('not find data in path, initialize it...')
         generator = Generator(
