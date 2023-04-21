@@ -38,7 +38,7 @@ namespace graph {
         static uint16_t half_size = img_size / 2;
         return std::sqrt(
             std::pow(x - half_size, 2) + std::pow(y - half_size, 2)
-        ) + r < half_size;
+        ) + r + 1 < half_size;
     }
 
     void Generator::gen_area(Area& area)

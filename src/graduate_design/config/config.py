@@ -20,6 +20,7 @@ class DataConfig:
     graph_type: Union[tuple, int] = 0
     theta_step: float = 0.
     angle: tuple = (0, 180)
+    ring: bool = False
     noise: bool = True
 
     def __post_init__(self):

@@ -45,6 +45,7 @@ def init() -> int:
     graph_num = config_for_data.graph_num
     graph_size = config_for_data.graph_size
     graph_type = config_for_data.graph_type
+    ring = config_for_data.ring
     angle = config_for_data.angle
     theta_step = config_for_data.theta_step
     add_noise = config_for_data.noise
@@ -56,6 +57,7 @@ def init() -> int:
         graph_size  : {graph_size}
         graph_num   : {graph_num}
         graph_type  : {graph_type}
+        ring        : {ring}
         angle       : {angle}
         theta_step  : {theta_step}
         noise       : {add_noise}
@@ -63,7 +65,8 @@ def init() -> int:
     global data_path
     data_path = data_path / \
         f'{img_size}x{img_size}_{img_num}_{pixel}_{graph_size}_{graph_num}' \
-        f'_{graph_type}_{angle}_{theta_step}_{"_noise" if add_noise else ""}'
+        f'_{graph_type}_{angle}_{theta_step}{"_ring" if ring else ""}'\
+        f'{"_noise" if add_noise else ""}'
     if not data_path.exists():
         logger.info('not find data in path, initialize it...')
         generator = Generator(
@@ -73,6 +76,7 @@ def init() -> int:
             graph_num,
             graph_size,
             graph_type,
+            ring,
             data_path,
         )
         transformer = Transformer(

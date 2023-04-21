@@ -7,7 +7,7 @@ import asyncio
 
 import aiofiles
 
-from ...cylib import Graph
+from ...cylib import Graph, Ring
 
 
 class Generator:
@@ -19,6 +19,7 @@ class Generator:
         graph_num: Union[list, int],
         graph_size: Union[list, int],
         graph_type: int,
+        ring: bool,
         data_path: Path,
     ) -> None:
         self._img_num = img_num
@@ -27,9 +28,15 @@ class Generator:
             self._get_circle_num = lambda: graph_num
         else:
             self._get_circle_num = partial(random.randint, *graph_num)
-        self._graph = Graph(
-            img_size,
-            (graph_size,) if type(graph_size) is int
+        self._graph = (
+            partial(
+                Ring,
+                ring_radius=int(img_size / 3),
+                ring_width=int(img_size / 24)
+            ) if ring else Graph
+        )(
+            img_size=img_size,
+            radius=(graph_size,) if type(graph_size) is int
             else tuple(graph_size)
         )
         self._pixel = pixel if type(pixel) is int else array.array('B', pixel)
