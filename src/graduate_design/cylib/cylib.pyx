@@ -12,7 +12,6 @@ from libc.stdlib cimport rand, srand
 from libc.time cimport time
 from libcpp.vector cimport vector
 from cpython cimport array
-import array
 from .graph cimport Generator, Area
 from .radon_transform cimport RadonTransformer
 
@@ -61,7 +60,7 @@ cdef class Graph:
             n = self.generator.gen(num, areas.data())
         cdef uchar alpha
         cdef uint16 i, _type
-        cdef array.array points = array.array('f', [0.] * 4)
+        cdef array.array[float] points = array.array('f', [0.] * 4)
         img = Image.new('L', (self.img_size, self.img_size), 0)
         draw = ImageDraw.Draw(img)
         for i in range(n):
@@ -143,7 +142,7 @@ cdef class Ring:
             n = self.generator.gen(num, areas.data())
         cdef uchar alpha
         cdef uint16 i, j, _type
-        cdef array.array points = array.array('f', [0.] * 4)
+        cdef array.array[float] points = array.array('f', [0.] * 4)
         cdef float* points_ptr = points.data.as_floats
         self.ring_generator.gen_circle(points_ptr, ring)
         zero_point[0] = points_ptr[0] + self.ring_width + 1
