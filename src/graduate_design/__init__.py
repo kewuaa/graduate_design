@@ -43,26 +43,40 @@ def validate(checkpoint_index: int = None, device: str = None):
     img, label, pre = net.validate()
     thetas = np.arange(0., 180., step=config.theta_step)
     iradon_img = iradon(img, theta=thetas, filter_name='ramp')
+    iradon_img_ = iradon(img, theta=thetas, filter_name='shepp-logan')
+    iradon_img = np.uint8(
+        (iradon_img - iradon_img.min()) / iradon_img.ptp() * 255
+    )
+    iradon_img_ = np.uint8(
+        (iradon_img_ - iradon_img_.min()) / iradon_img_.ptp() * 255
+    )
     psnr_unet = PSNR(label, pre)
     ssim_unet = SSIM(label, pre)
     psnr_fbp = PSNR(label, iradon_img)
-    ssim_fbp = SSIM(label, pre)
+    ssim_fbp = SSIM(label, iradon_img)
+    psnr_fbp = PSNR(label, iradon_img_)
+    ssim_fbp = SSIM(label, iradon_img_)
     print(f'''
-    PSNR of FBP is {psnr_fbp}
-    SSIM of FBP is {ssim_fbp}
+    PSNR of FBP with ramp filter is {psnr_fbp}
+    SSIM of FBP with ramp filter is {ssim_fbp}
+    PSNR of FBP with shepp-logan filter is {psnr_fbp}
+    SSIM of FBP with shepp-logan filter is {ssim_fbp}
     PSNR of U-NET is {psnr_unet}
     SSIM of U-NET is {ssim_unet}
     ''')
-    plt.subplot(141)
+    plt.subplot(151)
     plt.title('sinogram')
     plt.imshow(img, cmap='gray')
-    plt.subplot(142)
+    plt.subplot(152)
     plt.title('real image')
     plt.imshow(label, cmap='gray')
-    plt.subplot(143)
-    plt.title('FBP')
+    plt.subplot(153)
+    plt.title('FBP with ramp filter')
     plt.imshow(iradon_img, cmap='gray')
-    plt.subplot(144)
+    plt.subplot(154)
+    plt.title('FBP with shepp-logan filter')
+    plt.imshow(iradon_img_, cmap='gray')
+    plt.subplot(155)
     plt.title('predicted image')
     plt.imshow(pre, cmap='gray')
     plt.show()
@@ -74,13 +88,17 @@ def predict(img_path: str, checkpoint_index: int = None, device: str = None):
     pre = net.predict(img)
     thetas = np.arange(0., 180., step=config.theta_step)
     iradon_img = iradon(img, theta=thetas, filter_name='ramp')
-    plt.subplot(131)
+    iradon_img_ = iradon(img, theta=thetas, filter_name='shepp-logan')
+    plt.subplot(141)
     plt.title('sinogram')
     plt.imshow(img, cmap='gray')
-    plt.subplot(132)
-    plt.title('FBP')
+    plt.subplot(142)
+    plt.title('FBP with ramp filter')
     plt.imshow(iradon_img, cmap='gray')
-    plt.subplot(133)
+    plt.subplot(143)
+    plt.title('FBP with shepp-logan filter')
+    plt.imshow(iradon_img_, cmap='gray')
+    plt.subplot(144)
     plt.title('predicted image')
     plt.imshow(pre, cmap='gray')
     plt.show()

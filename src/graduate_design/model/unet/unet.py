@@ -66,6 +66,8 @@ class UNet(BaseNet):
 
     def pre_process(self, data: tuple):
         img, label = data
+        self.__img = img
+        self.__label = label
         img = cv2.resize(img, self._new_size, None, 0., 0., cv2.INTER_CUBIC)
         label = cv2.resize(label, self._new_size, None, 0., 0., cv2.INTER_NEAREST)
         for i, v in enumerate(self._unique_values):
@@ -164,7 +166,7 @@ class UNet(BaseNet):
         pre = self.predict(img, process=False)
         img = img.squeeze().numpy()
         label = label.squeeze().numpy()
-        img = cv2.resize(img, self._origin_size, None, 0., 0., cv2.INTER_CUBIC)
+        # img = cv2.resize(img, self._origin_size, None, 0., 0., cv2.INTER_CUBIC)
         label = cv2.resize(
             label.argmax(axis=0) if self.n_classes > 1 else label,
             self._origin_size,
@@ -174,9 +176,8 @@ class UNet(BaseNet):
         )
         for i, v in enumerate(self._unique_values):
             label[label == i + 1] = v
-        return img, label, pre
+        return self.__img, self.__label, pre
 
-    @timer
     @inference_mode()
     def predict(self, img, process: bool = True):
         if process:
@@ -186,13 +187,13 @@ class UNet(BaseNet):
             img = Tensor(np.expand_dims(img, axis=0)).contiguous()
             img = img.unsqueeze(0)
         img = img.to(self._device)
-        pre = self(img)
+        pre = timer(self.__call__)(img)
         pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:
             pre = pre.argmax(dim=1)
         else:
             pre = torch.sigmoid(pre) > 0.5
-        pre = pre.cpu().squeeze().numpy()
+        pre = pre.cpu().squeeze().numpy().astype(np.uint8)
         for i, v in enumerate(self._unique_values):
             pre[pre == i + 1] = v
         return pre
