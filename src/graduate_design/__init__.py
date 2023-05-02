@@ -54,13 +54,13 @@ def validate(checkpoint_index: int = None, device: str = None):
     ssim_unet = SSIM(label, pre)
     psnr_fbp = PSNR(label, iradon_img)
     ssim_fbp = SSIM(label, iradon_img)
-    psnr_fbp = PSNR(label, iradon_img_)
-    ssim_fbp = SSIM(label, iradon_img_)
+    psnr_fbp_ = PSNR(label, iradon_img_)
+    ssim_fbp_ = SSIM(label, iradon_img_)
     print(f'''
     PSNR of FBP with ramp filter is {psnr_fbp}
     SSIM of FBP with ramp filter is {ssim_fbp}
-    PSNR of FBP with shepp-logan filter is {psnr_fbp}
-    SSIM of FBP with shepp-logan filter is {ssim_fbp}
+    PSNR of FBP with shepp-logan filter is {psnr_fbp_}
+    SSIM of FBP with shepp-logan filter is {ssim_fbp_}
     PSNR of U-NET is {psnr_unet}
     SSIM of U-NET is {ssim_unet}
     ''')
