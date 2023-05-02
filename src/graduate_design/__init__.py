@@ -4,6 +4,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from skimage.transform import iradon
 from skimage.metrics import (
+    mean_squared_error as MSE,
     peak_signal_noise_ratio as PSNR,
     structural_similarity as SSIM
 )
@@ -50,19 +51,25 @@ def validate(checkpoint_index: int = None, device: str = None):
     iradon_img_ = np.uint8(
         (iradon_img_ - iradon_img_.min()) / iradon_img_.ptp() * 255
     )
-    psnr_unet = PSNR(label, pre)
-    ssim_unet = SSIM(label, pre)
+    mse_net = MSE(label, pre)
+    psnr_net = PSNR(label, pre)
+    ssim_net = SSIM(label, pre)
+    mse_fbp = MSE(label, iradon_img)
     psnr_fbp = PSNR(label, iradon_img)
     ssim_fbp = SSIM(label, iradon_img)
+    mse_fbp_ = MSE(label, iradon_img_)
     psnr_fbp_ = PSNR(label, iradon_img_)
     ssim_fbp_ = SSIM(label, iradon_img_)
     print(f'''
+    MSE of FBP with ramp filter is {mse_fbp}
     PSNR of FBP with ramp filter is {psnr_fbp}
     SSIM of FBP with ramp filter is {ssim_fbp}
+    MSE of FBP with shepp-logan filter is {mse_fbp_}
     PSNR of FBP with shepp-logan filter is {psnr_fbp_}
     SSIM of FBP with shepp-logan filter is {ssim_fbp_}
-    PSNR of U-NET is {psnr_unet}
-    SSIM of U-NET is {ssim_unet}
+    MSE of net is {mse_net}
+    PSNR of net is {psnr_net}
+    SSIM of net is {ssim_net}
     ''')
     plt.subplot(151)
     plt.title('sinogram')
