@@ -15,6 +15,7 @@ from ..base import BaseNet
 from .unet_parts import DoubleConv, Down, OutConv, Up
 from .. import losses
 from ...utils.toolfunc import dice_coeff
+from ...utils.tools import timer
 
 
 class UNet(BaseNet):
@@ -93,7 +94,6 @@ class UNet(BaseNet):
         torch.save(state_dict, path)
 
     def start_train(self, device: str = None):
-        boundary_loss = losses.BoundaryLoss()
         if self.n_classes > 1:
             dice_loss = losses.DiceLoss(1)
             addi_loss = nn.CrossEntropyLoss()
@@ -101,15 +101,16 @@ class UNet(BaseNet):
             dice_loss = losses.DiceLoss(0)
             addi_loss = nn.BCEWithLogitsLoss()
 
-        # def loss_func(input, target):
-        #     return dice_loss(input, target) + addi_loss(input, target)
-
         def loss_func(input, target):
-            _dice_loss = dice_loss(input, target)
-            percent = _dice_loss.item()
-            loss = (_dice_loss + addi_loss(input, target)) * percent + \
-                boundary_loss(input, target) * (1 - percent)
-            return loss
+            return dice_loss(input, target) + addi_loss(input, target)
+
+        # boundary_loss = losses.BoundaryLoss()
+        # def loss_func(input, target):
+        #     _dice_loss = dice_loss(input, target)
+        #     percent = _dice_loss.item()
+        #     loss = (_dice_loss + addi_loss(input, target)) * percent + \
+        #         boundary_loss(input, target) * (1 - percent)
+        #     return loss
         super().start_train(
             loss_func,
             partial(
@@ -175,6 +176,7 @@ class UNet(BaseNet):
             label[label == i + 1] = v
         return img, label, pre
 
+    @timer
     @inference_mode()
     def predict(self, img, process: bool = True):
         if process:
@@ -183,7 +185,7 @@ class UNet(BaseNet):
             img = (cv2.resize(img, self._new_size) / 255).astype(np.float32)
             img = Tensor(np.expand_dims(img, axis=0)).contiguous()
             img = img.unsqueeze(0)
-        img.to(self._device)
+        img = img.to(self._device)
         pre = self(img)
         pre = nn.functional.interpolate(pre, self._origin_size, mode='bilinear')
         if self.n_classes > 1:

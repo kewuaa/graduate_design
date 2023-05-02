@@ -36,11 +36,12 @@ class BaseNet(torch.nn.Module):
                 {info}
         ''')
 
-    def auto_load(self, index: int = None):
+    def auto_load(self, index: int = None, device: str = None):
         if index is None:
             index = self._config.epoch_num
         pth_file_path = self._checkpoint_dir / f'checkpoint_epoch{index}.pth'
         self.load(str(pth_file_path))
+        self.set_device(device)
         self.print_config()
 
     def load(self, path: Path) -> None:

@@ -31,8 +31,8 @@ class Generator:
         self._graph = (
             partial(
                 Ring,
-                ring_radius=int(img_size / 3),
-                ring_width=int(img_size / 24)
+                ring_radius=int(img_size / 4),
+                ring_width=2
             ) if ring else Graph
         )(
             img_size=img_size,

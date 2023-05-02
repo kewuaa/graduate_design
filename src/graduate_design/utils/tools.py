@@ -1,3 +1,6 @@
+from typing import Callable
+from functools import wraps
+from time import time
 from pathlib import Path
 
 
@@ -15,3 +18,14 @@ def find_root(start_path: str, rootmarks: list) -> str:
     for _dir in start_path.parents:
         if search_marks(_dir):
             return str(_dir)
+
+
+def timer(func: Callable) -> Callable:
+    @wraps(func)
+    def wrapped_func(*args, **kwargs):
+        start = time()
+        result = func(*args, **kwargs)
+        end = time()
+        print(f'function {func.__name__} costs {end - start} ms')
+        return result
+    return wrapped_func
