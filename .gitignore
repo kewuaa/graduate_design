@@ -2,8 +2,9 @@
 /config.toml
 .pytest_cache/
 real_data/
-release/
 __pycache__/
 build/
+dist/
+*.egg-info/
 *.pyd
 *.html

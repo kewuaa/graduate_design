@@ -1,7 +1,7 @@
-import torch
 import numpy as np
-from torch import Tensor
+import torch
 from scipy.ndimage import distance_transform_edt as distance
+from torch import Tensor
 
 
 def dice_coeff(

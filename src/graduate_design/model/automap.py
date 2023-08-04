@@ -1,8 +1,8 @@
 from functools import partial
 
 import cv2
-import torch
 import numpy as np
+import torch
 from torch import (
     Tensor,
     autocast,
@@ -12,9 +12,9 @@ from torch import (
     optim,
 )
 
+from ..utils.toolfunc import dice_coeff
 from .base import BaseNet, RegularizeLoss
 from .losses import DiceLoss
-from ..utils.toolfunc import dice_coeff
 
 
 class Automap(BaseNet):

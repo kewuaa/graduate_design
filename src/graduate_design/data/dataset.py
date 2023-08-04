@@ -4,8 +4,8 @@ import threading
 from functools import lru_cache, partial
 from pathlib import Path
 
-import cv2
 import aiofiles
+import cv2
 import numpy as np
 from rich.progress import Progress
 from torch import Tensor
@@ -15,6 +15,7 @@ from .. import config
 from ..logging import logger
 from .generator import Generator
 from .transformer import Transformer
+
 data_path = Path('./data')
 
 

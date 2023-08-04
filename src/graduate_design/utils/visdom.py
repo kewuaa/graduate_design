@@ -1,9 +1,9 @@
-from os import popen
 import sys
 import time
+from os import popen
 
-import visdom
 import numpy as np
+import visdom
 
 from ..logging import logger
 

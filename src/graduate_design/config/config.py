@@ -1,11 +1,12 @@
-from typing import Union
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional, Union
 
 try:
     import tomllib as toml
 except ImportError:
     import tomli as toml
+
 config_file = Path('./config.toml')
 __config = {}
 
@@ -55,19 +56,20 @@ class AutomapConfig(ModelConfig):
 @dataclass(order=False, eq=False)
 class UnetConfig(ModelConfig):
     n_classes: int = 0
-    unique_values: tuple = None
+    unique_values: tuple = None # pyright: ignore
 
 
 def init():
     global __config
+    config = {}
     if config_file.exists():
         with open(config_file, 'rb') as f:
             config = toml.load(f)
-    data = DataConfig(**config.get('data', {}))
+    data = DataConfig(**__config.get('data', {}))
     automap = AutomapConfig(**config.get('automap', {}))
     unet = UnetConfig(**config.get('unet', {}))
     if not (unet.n_classes and unet.unique_values):
-        if type(data.pixel) is int:
+        if isinstance(data.pixel, int):
             if unet.n_classes:
                 assert unet.n_classes == 2
             else:
@@ -85,7 +87,7 @@ def init():
     }
 
 
-def get(type_: str) -> dict:
+def get(type_: str) -> Optional[dict]:
     return __config.get(type_)
 
 

@@ -1,7 +1,7 @@
-from typing import Callable
 from functools import wraps
-from time import time
 from pathlib import Path
+from time import time
+from typing import Callable
 
 
 def find_root(start_path: str, rootmarks: list) -> str:

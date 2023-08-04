@@ -11,11 +11,12 @@ from torch import (
     nn,
     optim,
 )
-from ..base import BaseNet
-from .unet_parts import DoubleConv, Down, OutConv, Up
-from .. import losses
+
 from ...utils.toolfunc import dice_coeff
 from ...utils.tools import timer
+from .. import losses
+from ..base import BaseNet
+from .unet_parts import DoubleConv, Down, OutConv, Up
 
 
 class UNet(BaseNet):

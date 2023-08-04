@@ -1,9 +1,9 @@
-from typing import Union
-from functools import partial
-from pathlib import Path
-import random
 import array
 import asyncio
+import random
+from functools import partial
+from pathlib import Path
+from typing import Union
 
 import aiofiles
 

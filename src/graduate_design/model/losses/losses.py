@@ -2,8 +2,8 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from . import lovasz_losses
 from ...utils.toolfunc import dice_coeff, onehot2dist
+from . import lovasz_losses
 
 
 class LovaszLoss(nn.Module):

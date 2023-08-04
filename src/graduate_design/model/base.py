@@ -2,15 +2,15 @@ from functools import partial
 from pathlib import Path
 
 import torch
-from torch import optim, cuda, channels_last, nn, autocast
-from torch.utils.data import random_split, DataLoader
-from torchnet import meter
 from rich.progress import Progress
+from torch import autocast, channels_last, cuda, nn, optim
+from torch.utils.data import DataLoader, random_split
+from torchnet import meter
 
+from .. import config
 from ..data import Dataset
 from ..logging import logger
 from ..utils.visdom import Visualizer
-from .. import config
 
 
 class BaseNet(torch.nn.Module):
