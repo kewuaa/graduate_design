@@ -29,7 +29,7 @@ suffix = 'pyx' if use_cython else "cpp"
 include_dirs = os.environ['INCLUDE'].rstrip(";").split(";")
 include_dirs.append("./src/graduate_design/cylib/cpp/include")
 library_dirs = os.environ['LIB'].rstrip(";").split(";")
-libraries = ['opencv_world460']
+libraries = ['opencv_world460.dll']
 exts = [
     Extension(
         name='graduate_design.cylib.cylib',
